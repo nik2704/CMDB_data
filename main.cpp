@@ -7,6 +7,9 @@
 #include <filesystem>
 #include <thread>
 #include <unordered_map>
+#include <vector>
+#include <queue>   // Подключаем очередь
+#include <condition_variable>
 
 namespace beast = boost::beast;
 namespace http = beast::http;
@@ -15,6 +18,62 @@ namespace json = boost::json;
 using tcp = net::ip::tcp;
 
 std::unordered_map<int, std::unordered_map<std::string, std::string>> data_store;
+
+// Класс для пула потоков
+class ThreadPool {
+public:
+    ThreadPool(size_t threads) : stop(false) {
+        for (size_t i = 0; i < threads; ++i) {
+            workers.emplace_back([this] { this->worker(); });
+        }
+    }
+
+    ~ThreadPool() {
+        {
+            std::lock_guard<std::mutex> lock(queue_mutex);
+            stop = true;
+        }
+        cv.notify_all();
+        for (std::thread& worker : workers) {
+            worker.join();
+        }
+    }
+
+    // Добавление задачи в пул
+    void enqueue(std::function<void()> func) {
+        {
+            std::lock_guard<std::mutex> lock(queue_mutex);
+            tasks.push(std::move(func));
+        }
+        cv.notify_one();
+    }
+
+private:
+    void worker() {
+        while (true) {
+            std::function<void()> task;
+            {
+                std::unique_lock<std::mutex> lock(queue_mutex);
+                cv.wait(lock, [this] { return stop || !tasks.empty(); });
+
+                if (stop && tasks.empty())
+                    return;
+
+                task = std::move(tasks.front());
+                tasks.pop();
+            }
+            task();
+        }
+    }
+
+    std::vector<std::thread> workers;
+    std::queue<std::function<void()>> tasks;  // Очередь задач
+    std::mutex queue_mutex;
+    std::condition_variable cv;
+    bool stop;
+};
+
+ThreadPool pool(4); 
 
 // Функция для обработки PUT запроса с параметром id
 void handle_put_request(http::request<http::string_body>& req, http::response<http::string_body>& res) {
@@ -35,7 +94,6 @@ void handle_put_request(http::request<http::string_body>& req, http::response<ht
 
         res.set(http::field::server, "Boost.Beast HTTP Server");
         res.set(http::field::content_type, "application/json");
-        res.body() = R"({"status": "success", "message": "Record updated"})";
         res.body() = R"({"status": "success", "message": "Record updated", "id": )" + std::to_string(id) + R"(})";
 
         res.prepare_payload();
@@ -182,13 +240,15 @@ void handle_request(tcp::socket& socket) {
     http::write(socket, res);
 }
 
-void session(tcp::socket socket) {
+void session(std::shared_ptr<tcp::socket> socket) {
     try {
-        handle_request(socket);
+        handle_request(*socket);  // Dereference the shared_ptr when passing it to handle_request
     } catch (const std::exception& e) {
         std::cerr << "Ошибка: " << e.what() << "\n";
     }
 }
+
+
 
 int main() {
     try {
@@ -204,7 +264,18 @@ int main() {
         while (true) {
             tcp::socket socket{ioc};
             acceptor.accept(socket);
-            std::thread(&session, std::move(socket)).detach();
+
+            // Pass the socket by moving it into the session function
+            // Modify the enqueue call to pass a unique_ptr
+            // Modify the enqueue call to use a shared_ptr
+            // Modify the enqueue call to use a shared_ptr
+            pool.enqueue([socket = std::make_shared<tcp::socket>(std::move(socket))]() mutable {
+                session(socket);  // Pass the shared_ptr directly to session
+            });
+
+
+
+
         }
     } catch (const std::exception& e) {
         std::cerr << "Ошибка: " << e.what() << "\n";
