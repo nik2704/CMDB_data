@@ -73,7 +73,15 @@ private:
     bool stop;
 };
 
-ThreadPool pool(4); 
+size_t get_optimal_thread_count() {
+    // Количество логических процессоров
+    size_t cores = std::thread::hardware_concurrency();
+
+    // Для I/O-bound задач увеличим количество потоков в 2 раза
+    return cores * 2;  // Для I/O-bound задач можно попробовать увеличенное количество
+}
+
+ThreadPool pool(get_optimal_thread_count()); 
 
 // Функция для обработки PUT запроса с параметром id
 void handle_put_request(http::request<http::string_body>& req, http::response<http::string_body>& res) {
@@ -242,12 +250,12 @@ void handle_request(tcp::socket& socket) {
 
 void session(std::shared_ptr<tcp::socket> socket) {
     try {
+        std::cout << "Обработка запроса в потоке: " << std::this_thread::get_id() << std::endl;
         handle_request(*socket);  // Dereference the shared_ptr when passing it to handle_request
     } catch (const std::exception& e) {
         std::cerr << "Ошибка: " << e.what() << "\n";
     }
 }
-
 
 
 int main() {
