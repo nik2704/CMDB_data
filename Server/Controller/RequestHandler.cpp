@@ -2,16 +2,27 @@
 #include "../View/ResponseFormatter.h"
 
 void RequestHandler::HandleRequest(http::request<http::string_body>& req, http::response<http::string_body>& res) {
-    if (req.method() == http::verb::get) {
-        HandleGetRequest(res);
-    } else if (req.method() == http::verb::post) {
-        HandlePostRequest(req, res);
-    } else if (req.method() == http::verb::put) {
-        HandlePutRequest(req, res);
-    } else if (req.method() == http::verb::patch) {
-        HandlePatchRequest(req, res);
+
+    std::string_view target = req.target();
+    std::string_view api_path = "/api/v1/data";
+
+    if (target.substr(0, api_path.size()) == api_path &&
+        (target.size() == api_path.size() || target[api_path.size()] == '?')) {
+        
+        if (req.method() == http::verb::get) {
+            HandleGetRequest(res);
+        } else if (req.method() == http::verb::post) {
+            HandlePostRequest(req, res);
+        } else if (req.method() == http::verb::put) {
+            HandlePutRequest(req, res);
+        } else if (req.method() == http::verb::patch) {
+            HandlePatchRequest(req, res);
+        } else {
+            ResponseFormatter::MakeErrorResponse(res, http::status::method_not_allowed, "Method not allowed");
+        }
+
     } else {
-        ResponseFormatter::MakeErrorResponse(res, http::status::method_not_allowed, "Method not allowed");
+        ResponseFormatter::MakeErrorResponse(res, http::status::no_content, "Hello, from the Server!");
     }
 }
 
