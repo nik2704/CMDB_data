@@ -14,7 +14,14 @@ set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost 1.67 REQUIRED COMPONENTS system thread json)
 
 # Добавляем исполняемый файл
-add_executable(cmdb_service main.cpp)
+add_executable(cmdb_service 
+    main.cpp
+    Server/Server.cpp
+    Server/ThreadPool/ThreadPool.cpp
+    Server/Model/DataStore.cpp
+    Server/View/ResponseFormatter.cpp
+    Server/Controller/RequestHandler.cpp
+)
 
 # Подключаем Boost библиотеки
 if(Boost_FOUND)
