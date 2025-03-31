@@ -1,7 +1,7 @@
 #include "Server.h"
 
 Server::Server(int port, size_t thread_count)
-    : ioc_(thread_count), acceptor_(ioc_, {tcp::v4(), static_cast<boost::asio::ip::port_type>(port)}), pool_(thread_count), handler_(data_store_) {}
+    : ioc_(thread_count), acceptor_(ioc_, {tcp::v4(), static_cast<boost::asio::ip::port_type>(port)}), pool_(thread_count), handler_(DataStore::getInstance()) {}
 
 void Server::Run() {
     std::cout << "HTTP сервер запущен на порту " << acceptor_.local_endpoint().port() << "\n";

@@ -1,5 +1,10 @@
 #include "DataStore.h"
 
+DataStore& DataStore::getInstance() {
+    static DataStore instance;
+    return instance;
+}
+
 int DataStore::AddRecord(const json::object& record) {
     int new_id = data_.size() + 1;
     for (auto& [key, value] : record) {

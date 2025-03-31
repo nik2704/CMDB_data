@@ -27,6 +27,6 @@ private:
     net::io_context ioc_;
     tcp::acceptor acceptor_;
     ThreadPool pool_;
-    DataStore data_store_;
+    // DataStore data_store_;
     RequestHandler handler_;
 };
