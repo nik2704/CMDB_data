@@ -1,7 +1,13 @@
 #include "Server.h"
 
+
 Server::Server(int port, size_t thread_count)
-    : ioc_(thread_count), acceptor_(ioc_, {tcp::v4(), static_cast<boost::asio::ip::port_type>(port)}), pool_(thread_count), handler_(DataStore::getInstance()) {}
+    : ioc_(thread_count),
+      acceptor_(ioc_, {tcp::v4(), static_cast<net::ip::port_type>(port)}),
+      pool_(thread_count),
+      cmdb_(cmdb::CMDB::getInstance("cmdb.bin")),
+      data_store_(cmdb_),
+      handler_(data_store_) {}
 
 void Server::Run() {
     std::cout << "HTTP сервер запущен на порту " << acceptor_.local_endpoint().port() << "\n";

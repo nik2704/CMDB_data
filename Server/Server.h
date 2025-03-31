@@ -10,6 +10,7 @@
 #include "ThreadPool/ThreadPool.h"
 #include "Model/DataStore.h"
 #include "Controller/RequestHandler.h"
+#include "../CMDB/CMDB.h"
 
 namespace beast = boost::beast;
 namespace http = beast::http;
@@ -27,6 +28,7 @@ private:
     net::io_context ioc_;
     tcp::acceptor acceptor_;
     ThreadPool pool_;
-    // DataStore data_store_;
+    cmdb::CMDB& cmdb_;
+    DataStore data_store_;
     RequestHandler handler_;
 };

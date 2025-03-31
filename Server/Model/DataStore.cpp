@@ -1,9 +1,6 @@
 #include "DataStore.h"
 
-DataStore& DataStore::getInstance() {
-    static DataStore instance;
-    return instance;
-}
+DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
 
 int DataStore::AddRecord(const json::object& record) {
     int new_id = data_.size() + 1;
