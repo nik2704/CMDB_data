@@ -21,6 +21,9 @@ add_executable(cmdb_service
     Server/Model/DataStore.cpp
     Server/View/ResponseFormatter.cpp
     Server/Controller/RequestHandler.cpp
+    CMDB/CI.cpp
+    CMDB/Relationship.cpp
+    CMDB/CMDB.cpp
 )
 
 # Подключаем Boost библиотеки
