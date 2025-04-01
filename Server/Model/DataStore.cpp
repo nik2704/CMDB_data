@@ -11,7 +11,7 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
             for (const auto& level : *levels) {
                 levelsArray.push_back(json::value(level));
             }
-            
+
             result["levels"] = levelsArray;
         }
 
@@ -53,8 +53,13 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
     }
 
     json::object DataStore::GetLevel(int id) {
-        // Заглушка: возвращает пустой JSON-объект
-        return json::object();
+        json::object result;
+
+        auto levelName = cmdb_.getLevelName(id);
+
+        if (levelName.has_value()) result["name"] = levelName.value();
+
+        return result;
     }
 
     json::array DataStore::GetCi(const std::map<std::string, std::string>& filters) {

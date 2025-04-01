@@ -7,6 +7,11 @@ void RequestHandler::HandleRequest(http::request<http::string_body>& req, http::
 
     if (target.substr(0, api_path.size()) == api_path) {
         std::string_view sub_target = target.substr(api_path.size());
+        size_t query_start = sub_target.find('?');
+
+        if (query_start != std::string_view::npos) {
+            sub_target = sub_target.substr(0, query_start);
+        }
 
         if (sub_target == "/all") {
             if (req.method() == http::verb::get) {
