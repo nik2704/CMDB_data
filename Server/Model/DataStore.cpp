@@ -48,8 +48,15 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
     }
 
     json::array DataStore::GetAllLevels() {
-        // Заглушка: возвращает пустой JSON-массив
-        return json::array();
+        json::array levelsArray;
+
+        if (auto levels = cmdb_.getLevels()) {
+            for (const auto& level : *levels) {
+                levelsArray.push_back(json::value(level));
+            }
+        }
+
+        return levelsArray;
     }
 
     json::object DataStore::GetLevel(int id) {
