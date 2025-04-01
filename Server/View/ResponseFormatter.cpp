@@ -1,13 +1,20 @@
 #include "ResponseFormatter.h"
 
-void ResponseFormatter::MakeJSONResponse(http::response<http::string_body>& res, const json::object& data) {
-    res.result(http::status::ok);
-    res.body() = json::serialize(data);
+void ResponseFormatter::MakeJSONResponse(http::response<http::string_body>& res, const json::object& obj) {
+    res.set(http::field::content_type, "application/json");
+    res.body() = json::serialize(obj);
+    res.prepare_payload();
+}
+
+void ResponseFormatter::MakeJSONResponse(http::response<http::string_body>& res, const json::array& arr) {
+    res.set(http::field::content_type, "application/json");
+    res.body() = json::serialize(arr);
     res.prepare_payload();
 }
 
 void ResponseFormatter::MakeErrorResponse(http::response<http::string_body>& res, http::status status, const std::string& message) {
     res.result(status);
-    res.body() = R"({"error": ")" + message + R"("})";
+    res.set(http::field::content_type, "application/json");
+    res.body() = json::serialize(json::object({{"error", message}}));
     res.prepare_payload();
 }

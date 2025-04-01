@@ -12,6 +12,7 @@ namespace json = boost::json;
 
 class ResponseFormatter {
 public:
-    static void MakeJSONResponse(http::response<http::string_body>& res, const json::object& data);
+    static void MakeJSONResponse(http::response<http::string_body>& res, const json::object& obj);
+    static void MakeJSONResponse(http::response<http::string_body>& res, const json::array& arr);
     static void MakeErrorResponse(http::response<http::string_body>& res, http::status status, const std::string& message);
 };
