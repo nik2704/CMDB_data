@@ -20,10 +20,7 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
             for (const auto& ciPtr : *cis) {
                 if (ciPtr) {
                     json::object ciObject;
-                    ciObject["id"] = ciPtr->getId();
-                    ciObject["name"] = ciPtr->getName();
-                    ciObject["type"] = ciPtr->getType();
-                    ciObject["level"] = ciPtr->getLevel();
+                    ciObject = ciPtr->asJSON();
                     cisArray.push_back(ciObject);
                 }
             }
@@ -89,7 +86,7 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
 
         try {
             if (!ci.contains("id") || !ci.contains("name") || !ci.contains("type") || !ci.contains("level")) {
-                throw std::runtime_error("Missing required fields in CI object.");
+                throw std::runtime_error("Не запонены обязательные поля.");
             }
 
             std::string id = boost::json::value_to<std::string>(ci.at("id"));
@@ -98,33 +95,33 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
             int level = boost::json::value_to<int>(ci.at("level"));
 
             if (isCIexists(id)) {
-                throw std::runtime_error("CI with id " + id + " already exists.");
+                throw std::runtime_error("КЕ с таким id " + id + " уже существует.");
             }
 
             std::unordered_map<std::string, std::string> properties;
             if (ci.contains("properties")) {
                 if (!ci.at("properties").is_object()) {
-                    throw std::runtime_error("Data Store (AddCi): Properties field must be a JSON object.");
+                    throw std::runtime_error("Data Store (AddCi): Свойства должны быть объектом JSON.");
                 }
 
                 auto propertiesJson = ci.at("properties").as_object();
 
                 for (auto it = propertiesJson.begin(); it != propertiesJson.end(); ++it) {
                     if (!it->value().is_string()) {
-                        throw std::runtime_error("Properties values must be strings.");
+                        throw std::runtime_error("Значение свойства должны быть строковыми.");
                     }
                     properties[it->key()] = boost::json::value_to<std::string>(it->value());
                 }
             }
 
             if (!cmdb_.addCI(id, name, ciType, level, properties)) {
-                throw std::runtime_error("Failed to add CI to CMDB.");
+                throw std::runtime_error("Ошибка добавления КЕ в CMDB.");
             }
 
             result["status"] = "success";
         } catch (const std::exception& e) {
             result["error"] = e.what();
-            std::cerr << "Error adding CI: " << e.what() << std::endl;
+            std::cerr << "Ошибка добавления КЕ: " << e.what() << std::endl;
         }
 
         return result;

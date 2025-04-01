@@ -17,7 +17,7 @@ void RequestHandler::HandleRequest(http::request<http::string_body>& req, http::
             if (req.method() == http::verb::get) {
                 HandleGetAll(res);
             } else {
-                ResponseFormatter::MakeErrorResponse(res, http::status::method_not_allowed, "Method not allowed");
+                ResponseFormatter::MakeErrorResponse(res, http::status::method_not_allowed, "Метод не разрешен");
             }
         } else if (sub_target == "/level") {
             if (req.method() == http::verb::get) {
@@ -29,7 +29,7 @@ void RequestHandler::HandleRequest(http::request<http::string_body>& req, http::
             } else if (req.method() == http::verb::patch) {
                 HandleUpdateLevel(req, res);
             } else {
-                ResponseFormatter::MakeErrorResponse(res, http::status::method_not_allowed, "Method not allowed");
+                ResponseFormatter::MakeErrorResponse(res, http::status::method_not_allowed, "Метод не разрешен");
             }
         } else if (sub_target == "/ci") {
             if (req.method() == http::verb::get) {
@@ -41,7 +41,7 @@ void RequestHandler::HandleRequest(http::request<http::string_body>& req, http::
             } else if (req.method() == http::verb::patch) {
                 HandleUpdateCi(req, res);
             } else {
-                ResponseFormatter::MakeErrorResponse(res, http::status::method_not_allowed, "Method not allowed");
+                ResponseFormatter::MakeErrorResponse(res, http::status::method_not_allowed, "Метод не разрешен");
             }
         } else if (sub_target == "/relationship") {
             if (req.method() == http::verb::get) {
@@ -51,7 +51,7 @@ void RequestHandler::HandleRequest(http::request<http::string_body>& req, http::
             } else if (req.method() == http::verb::delete_) {
                 HandleDeleteRelationships(req, res);
             } else {
-                ResponseFormatter::MakeErrorResponse(res, http::status::method_not_allowed, "Method not allowed");
+                ResponseFormatter::MakeErrorResponse(res, http::status::method_not_allowed, "Метод не разрешен");
             }
         } else {
             ResponseFormatter::MakeErrorResponse(res, http::status::not_found, "Not found");
@@ -73,9 +73,14 @@ void RequestHandler::HandleGetLevel(http::request<http::string_body>& req, http:
         try {
             int id = std::stoi(query_params["id"]);
             json::object level = store_.GetLevel(id);
-            ResponseFormatter::MakeJSONResponse(res, level);
+            
+            if(level.empty()) {
+                ResponseFormatter::MakeErrorResponse(res, http::status::not_found, "Level не найден");
+            } else {
+                ResponseFormatter::MakeJSONResponse(res, level);
+            }
         } catch (...) {
-            ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "Invalid id");
+            ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "Не корректный id");
         }
     } else {
         json::array levels = store_.GetAllLevels();
@@ -147,7 +152,7 @@ void RequestHandler::HandleAddCi(http::request<http::string_body>& req, http::re
     } catch (const std::exception& e) {
         ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, e.what());
     } catch (...) {
-        ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "Invalid JSON data");
+        ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "Не корректный JSON");
     }
 }
 
@@ -157,7 +162,7 @@ void RequestHandler::HandleAddRelationships(http::request<http::string_body>& re
         store_.AddRelationships(json_data);
         ResponseFormatter::MakeJSONResponse(res, json::object{{"status", "success"}});
     } catch (...) {
-        ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "Invalid JSON data");
+        ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "Не корректный JSON");
     }
 }
 
