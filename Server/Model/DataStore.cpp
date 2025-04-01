@@ -2,9 +2,49 @@
 
 DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
 
-json::object DataStore::GetAllRecords() {
-        // Заглушка: возвращает пустой JSON-объект
-        return json::object();
+    json::object DataStore::GetAllRecords() {
+        json::object result;
+
+        if (auto levels = cmdb_.getLevels()) {
+            json::array levelsArray;
+
+            for (const auto& level : *levels) {
+                levelsArray.push_back(json::value(level));
+            }
+            
+            result["levels"] = levelsArray;
+        }
+
+        if (auto cis = cmdb_.getCIs()) {
+            json::array cisArray;
+            for (const auto& ciPtr : *cis) {
+                if (ciPtr) {
+                    json::object ciObject;
+                    ciObject["id"] = ciPtr->getId();
+                    ciObject["name"] = ciPtr->getName();
+                    ciObject["type"] = ciPtr->getType();
+                    ciObject["level"] = ciPtr->getLevel();
+                    cisArray.push_back(ciObject);
+                }
+            }
+            result["cis"] = cisArray;
+        }
+
+        if (auto relationships = cmdb_.getRelationships()) {
+            json::array relationshipsArray;
+            for (const auto& relationshipPtr : *relationships) {
+                if (relationshipPtr) {
+                    json::object relationshipObject;
+                    relationshipObject["from_id"] = relationshipPtr->getSource();
+                    relationshipObject["to_id"] = relationshipPtr->getDestination();
+                    relationshipObject["type"] = relationshipPtr->getType();
+                    relationshipsArray.push_back(relationshipObject);
+                }
+            }
+            result["relationships"] = relationshipsArray;
+        }
+
+        return result;
     }
 
     json::array DataStore::GetAllLevels() {
