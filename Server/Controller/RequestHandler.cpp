@@ -8,19 +8,7 @@ void RequestHandler::HandleRequest(http::request<http::string_body>& req, http::
     if (target.substr(0, api_path.size()) == api_path) {
         std::string_view sub_target = target.substr(api_path.size());
 
-        if (sub_target.empty() || sub_target[0] == '?') {
-            if (req.method() == http::verb::get) {
-                HandleGetAll(res);
-            } else if (req.method() == http::verb::post) {
-                HandlePostRequest(req, res);
-            } else if (req.method() == http::verb::put) {
-                HandlePutRequest(req, res);
-            } else if (req.method() == http::verb::patch) {
-                HandlePatchRequest(req, res);
-            } else {
-                ResponseFormatter::MakeErrorResponse(res, http::status::method_not_allowed, "Method not allowed");
-            }
-        } else if (sub_target == "/all") {
+        if (sub_target == "/all") {
             if (req.method() == http::verb::get) {
                 HandleGetAll(res);
             } else {
@@ -74,20 +62,7 @@ void RequestHandler::HandleGetAll(http::response<http::string_body>& res) {
 }
 
 void RequestHandler::HandleGetLevel(http::request<http::string_body>& req, http::response<http::string_body>& res) {
-    std::map<std::string, std::string> query_params;
-    std::string_view target = req.target();
-    size_t query_start = target.find('?');
-    if (query_start != std::string_view::npos) {
-        std::string query_string(target.substr(query_start + 1));
-        std::stringstream ss(query_string);
-        std::string item;
-        while (std::getline(ss, item, '&')) {
-            size_t equals_pos = item.find('=');
-            if (equals_pos != std::string::npos) {
-                query_params[item.substr(0, equals_pos)] = item.substr(equals_pos + 1);
-            }
-        }
-    }
+    std::map<std::string, std::string> query_params = getQueryParams(req);
 
     if (query_params.count("id")) {
         try {
@@ -300,6 +275,26 @@ void RequestHandler::HandlePatchRequest(http::request<http::string_body>& req, h
     }
 }
 
+std::map<std::string, std::string> RequestHandler::getQueryParams(http::request<http::string_body>& req) {
+    std::map<std::string, std::string> query_params;
+    std::string_view target = req.target();
+    size_t query_start = target.find('?');
+
+    if (query_start != std::string_view::npos) {
+        std::string query_string(target.substr(query_start + 1));
+        std::stringstream ss(query_string);
+        std::string item;
+
+        while (std::getline(ss, item, '&')) {
+            size_t equals_pos = item.find('=');
+            if (equals_pos != std::string::npos) {
+                query_params[item.substr(0, equals_pos)] = item.substr(equals_pos + 1);
+            }
+        }
+    }
+
+    return query_params;
+}
 // void RequestHandler::HandleRequest(http::request<http::string_body>& req, http::response<http::string_body>& res) {
 
 //     std::string_view target = req.target();

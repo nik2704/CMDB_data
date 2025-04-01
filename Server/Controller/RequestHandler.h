@@ -36,6 +36,8 @@ void HandleGetAll(http::response<http::string_body>& res);
 
     void HandlePostRequest(http::request<http::string_body>& req, http::response<http::string_body>& res);
     void HandlePutRequest(http::request<http::string_body>& req, http::response<http::string_body>& res);
-    void HandlePatchRequest(http::request<http::string_body>& req, http::response<http::string_body>& res);    
+    void HandlePatchRequest(http::request<http::string_body>& req, http::response<http::string_body>& res);
+
+    std::map<std::string, std::string> getQueryParams(http::request<http::string_body>& req);
     DataStore& store_;
 };
