@@ -83,12 +83,57 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
         // Заглушка: ничего не делает
     }
 
-    void DataStore::AddCi(const json::object& ci) {
-        // Заглушка: ничего не делает
+    boost::json::object DataStore::AddCi(const boost::json::object& ci) {
+        boost::json::object result = ci;
+        result["status"] = "failure";
+
+        try {
+            if (!ci.contains("id") || !ci.contains("name") || !ci.contains("type") || !ci.contains("level")) {
+                throw std::runtime_error("Missing required fields in CI object.");
+            }
+
+            std::string id = boost::json::value_to<std::string>(ci.at("id"));
+            std::string name = boost::json::value_to<std::string>(ci.at("name"));
+            std::string ciType = boost::json::value_to<std::string>(ci.at("type"));
+            int level = boost::json::value_to<int>(ci.at("level"));
+
+            if (isCIexists(id)) {
+                throw std::runtime_error("CI with id " + id + " already exists.");
+            }
+
+            std::unordered_map<std::string, std::string> properties;
+            if (ci.contains("properties")) {
+                if (!ci.at("properties").is_object()) {
+                    throw std::runtime_error("Data Store (AddCi): Properties field must be a JSON object.");
+                }
+
+                auto propertiesJson = ci.at("properties").as_object();
+
+                for (auto it = propertiesJson.begin(); it != propertiesJson.end(); ++it) {
+                    if (!it->value().is_string()) {
+                        throw std::runtime_error("Properties values must be strings.");
+                    }
+                    properties[it->key()] = boost::json::value_to<std::string>(it->value());
+                }
+            }
+
+            if (!cmdb_.addCI(id, name, ciType, level, properties)) {
+                throw std::runtime_error("Failed to add CI to CMDB.");
+            }
+
+            result["status"] = "success";
+        } catch (const std::exception& e) {
+            result["error"] = e.what();
+            std::cerr << "Error adding CI: " << e.what() << std::endl;
+        }
+
+        return result;
     }
 
-    void DataStore::AddCis(const json::array& cis) {
+     boost::json::object DataStore::AddCis(const json::array& cis) {
+         boost::json::object result;
         // Заглушка: ничего не делает
+        return result;
     }
 
     void DataStore::AddRelationships(const json::array& relationships) {
@@ -129,6 +174,9 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
         return false;
     }
 
+    bool DataStore::isCIexists(std::string id) {
+        return cmdb_.getCI(id) != nullptr ? true : false;
+    }
 // int DataStore::AddRecord(const json::object& record) {
 //     int new_id = data_.size() + 1;
 //     for (auto& [key, value] : record) {

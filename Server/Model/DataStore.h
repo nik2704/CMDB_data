@@ -1,6 +1,7 @@
 #pragma once
 
 #include <boost/json.hpp>
+#include <string>
 #include <map>
 #include <unordered_map>
 #include <thread>
@@ -28,9 +29,9 @@ public:
 
     void AddLevel(const json::object& level);
 
-    void AddCi(const json::object& ci);
+    boost::json::object AddCi(const json::object& ci);
 
-    void AddCis(const json::array& cis);
+     boost::json::object AddCis(const json::array& cis);
 
     void AddRelationships(const json::array& relationships);
 
@@ -53,4 +54,6 @@ public:
 private:
     std::unordered_map<int, std::unordered_map<std::string, std::string>> data_;
     cmdb::CMDB& cmdb_;
+
+    bool isCIexists(std::string id);
 };

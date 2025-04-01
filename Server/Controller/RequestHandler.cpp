@@ -134,14 +134,18 @@ void RequestHandler::HandleAddLevel(http::request<http::string_body>& req, http:
 void RequestHandler::HandleAddCi(http::request<http::string_body>& req, http::response<http::string_body>& res) {
     try {
         auto json_data = json::parse(req.body());
+
         if (json_data.is_array()) {
-            store_.AddCis(json_data.as_array());
+            auto results = store_.AddCis(json_data.as_array());
+            ResponseFormatter::MakeJSONResponse(res, results);
         } else if (json_data.is_object()) {
-            store_.AddCi(json_data.as_object());
+            auto result = store_.AddCi(json_data.as_object());
+            ResponseFormatter::MakeJSONResponse(res, result);
         } else {
             throw std::runtime_error("Invalid JSON data");
         }
-        ResponseFormatter::MakeJSONResponse(res, json::object{{"status", "success"}});
+    } catch (const std::exception& e) {
+        ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, e.what());
     } catch (...) {
         ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "Invalid JSON data");
     }
