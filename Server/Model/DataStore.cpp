@@ -152,7 +152,6 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
 
     json::object DataStore::DeleteLevel(int id) {
         json::object result;
-        std::cout<< "DELETE LEVEL " << id << std::endl;
 
         result["status"] = "success";
         result["message"] = "Удален";
