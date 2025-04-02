@@ -113,6 +113,15 @@ public:
     bool setLevels(const std::vector<std::string>* new_levels);
 
     /**
+     * @brief Переименовать уровень.
+     *
+     * @param index Индекс уровня.
+     * @param new_name Новое название.
+     * @return true, если переименование прошло успешно, иначе false.
+     */
+    bool renameLevel(size_t index, std::string new_name);
+
+    /**
      * @brief Получить имя уровня по индексу.
      *
      * @param index Индекс уровня.

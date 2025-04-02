@@ -45,7 +45,7 @@ public:
 
     void UpdateCis(const json::array& cis);
 
-    void UpdateLevel(const json::object& level);
+    json::object UpdateLevel(const json::object& level);
 
     int AddRecord(const json::object& record);
 

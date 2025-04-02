@@ -88,6 +88,18 @@ int CMDB::addLevel(const std::string& name) {
     return levels_.size() - 1;
 }
 
+bool CMDB::renameLevel(size_t index, std::string new_name) {
+    if (index >= levels_.size()) {
+        return false;
+    }
+
+    levels_[index] = new_name; 
+
+    modified_ = true;
+
+    return true;
+}
+
 bool CMDB::removeLevel(size_t index) {
     if (index >= levels_.size()) {
         return false;

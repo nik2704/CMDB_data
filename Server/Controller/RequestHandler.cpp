@@ -248,13 +248,15 @@ void RequestHandler::HandleUpdateCi(http::request<http::string_body>& req, http:
 }
 
 void RequestHandler::HandleUpdateLevel(http::request<http::string_body>& req, http::response<http::string_body>& res) {
-    try {
-        auto json_data = json::parse(req.body()).as_object();
-        store_.UpdateLevel(json_data);
-        ResponseFormatter::MakeJSONResponse(res, json::object{{"status", "success"}});
-    } catch (...) {
-        ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "Invalid JSON data");
+    auto json_data = json::parse(req.body()).as_object();
+    auto result = store_.UpdateLevel(json_data);
+
+    if (isResultSuccess(result)) {
+        ResponseFormatter::MakeJSONResponse(res, result);
+    } else {
+        ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "Уровень не обновлен");
     }
+
 }
 
 void RequestHandler::HandlePostRequest(http::request<http::string_body>& req, http::response<http::string_body>& res) {

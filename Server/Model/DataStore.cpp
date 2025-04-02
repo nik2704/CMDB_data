@@ -153,7 +153,7 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
     json::object DataStore::DeleteLevel(int id) {
         json::object result;
         std::cout<< "DELETE LEVEL " << id << std::endl;
-        
+
         result["status"] = "success";
         result["message"] = "Удален";
 
@@ -181,9 +181,29 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
         // Заглушка: ничего не делает
     }
 
-    void DataStore::UpdateLevel(const json::object& level) {
-        // Заглушка: ничего не делает
-    }
+    json::object DataStore::UpdateLevel(const json::object& level) {
+        json::object result;
+        result["status"] = "failure";
+
+        if (!level.contains("name") || !level.contains("id")) {
+            result["error"] = "оОтсутствует тег name или id";
+
+            return result;
+        }
+
+        size_t id = boost::json::value_to<int>(level.at("id"));
+        std::string name = boost::json::value_to<std::string>(level.at("name"));
+
+        if (cmdb_.renameLevel(id, name)) {            
+            result["status"] = "success";
+        }
+
+        json::object updt_level;
+        updt_level["id"] = id;
+        updt_level["name"] = name;
+        result["level"] = updt_level;
+
+        return result;    }
 
     int DataStore::AddRecord(const json::object& record) {
         // Заглушка: возвращает 0
