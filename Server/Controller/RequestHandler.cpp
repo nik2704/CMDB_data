@@ -129,8 +129,14 @@ void RequestHandler::HandleGetRelationships(http::request<http::string_body>& re
 void RequestHandler::HandleAddLevel(http::request<http::string_body>& req, http::response<http::string_body>& res) {
     try {
         auto json_data = json::parse(req.body()).as_object();
-        store_.AddLevel(json_data);
-        ResponseFormatter::MakeJSONResponse(res, json::object{{"status", "success"}});
+        auto result = store_.AddLevel(json_data);
+
+        if (isResultSuccess(result)) {
+            ResponseFormatter::MakeJSONResponse(res, result);
+        } else {
+            ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "Уровень не добавлен");
+        }
+        
     } catch (...) {
         ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "Invalid JSON data");
     }
@@ -167,26 +173,18 @@ void RequestHandler::HandleAddRelationships(http::request<http::string_body>& re
 }
 
 void RequestHandler::HandleDeleteLevel(http::request<http::string_body>& req, http::response<http::string_body>& res) {
-    std::map<std::string, std::string> query_params;
-    std::string_view target = req.target();
-    size_t query_start = target.find('?');
-    if (query_start != std::string_view::npos) {
-        std::string query_string(target.substr(query_start + 1));
-        std::stringstream ss(query_string);
-        std::string item;
-        while (std::getline(ss, item, '&')) {
-            size_t equals_pos = item.find('=');
-            if (equals_pos != std::string::npos) {
-                query_params[item.substr(0, equals_pos)] = item.substr(equals_pos + 1);
-            }
-        }
-    }
+    std::map<std::string, std::string> query_params = getQueryParams(req);
 
     if (query_params.count("id")) {
         try {
             int id = std::stoi(query_params["id"]);
-            store_.DeleteLevel(id);
-            ResponseFormatter::MakeJSONResponse(res, json::object{{"status", "success"}});
+            auto result = store_.DeleteLevel(id);
+
+            if (isResultSuccess(result)) {
+                ResponseFormatter::MakeJSONResponse(res, result);
+            } else {
+                ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "Уровень не удален");
+            }
         } catch (...) {
             ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "Invalid id");
         }
@@ -309,6 +307,26 @@ std::map<std::string, std::string> RequestHandler::getQueryParams(http::request<
 
     return query_params;
 }
+
+bool RequestHandler::isResultSuccess(json::object& result) {
+    if (!result.contains("status")) {
+        return true;
+    }
+
+    std::string status = boost::json::value_to<std::string>(result.at("status"));
+    if (status != "success") return false;
+
+    return true;
+}
+
+// void RequestHandler::fillFailureInfo(json::object& internal_result, boost::json::object & result) {
+//     result["status"] = "failure";
+
+//     if (internal_result.contains("error")) {
+//         result["error"] = boost::json::value_to<std::string>(internal_result.at("error"));
+//     }
+// }
+
 // void RequestHandler::HandleRequest(http::request<http::string_body>& req, http::response<http::string_body>& res) {
 
 //     std::string_view target = req.target();

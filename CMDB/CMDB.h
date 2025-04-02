@@ -136,6 +136,16 @@ public:
     std::shared_ptr<std::vector<std::string>> getLevels() const;
 
     /**
+     * @brief Удалить уровень по индексу.
+     *
+     * Удаление уровня, если с ним не ассоциирован не один КЕ.
+     * 
+     * @param index Индекс уровня.
+     * @return true если уровень удален.
+     */
+    bool removeLevel(size_t index);
+
+    /**
      * @brief Добавить конфигурационную единицу.
      *
      * @param id Идентификатор конфигурационной единицы.

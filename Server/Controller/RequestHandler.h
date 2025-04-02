@@ -38,6 +38,10 @@ void HandleGetAll(http::response<http::string_body>& res);
     void HandlePutRequest(http::request<http::string_body>& req, http::response<http::string_body>& res);
     void HandlePatchRequest(http::request<http::string_body>& req, http::response<http::string_body>& res);
 
+    bool isResultSuccess(json::object& result);
+    // void fillFailureInfo(json::object& internal_result, boost::json::object & result);
+
     std::map<std::string, std::string> getQueryParams(http::request<http::string_body>& req);
     DataStore& store_;
+
 };

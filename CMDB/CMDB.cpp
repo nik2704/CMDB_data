@@ -88,6 +88,23 @@ int CMDB::addLevel(const std::string& name) {
     return levels_.size() - 1;
 }
 
+bool CMDB::removeLevel(size_t index) {
+    if (index >= levels_.size()) {
+        return false;
+    }
+
+    auto cis = getCIs(index);
+
+    if (cis && !cis->empty()) {
+        return false;
+    }
+
+    levels_.erase(levels_.begin() + index);
+    modified_ = true;
+
+    return true;
+}
+
 void CMDB::addLevels(const std::vector<std::string>* new_levels) {
     if (!new_levels) return;
 

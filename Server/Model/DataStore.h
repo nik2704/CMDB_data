@@ -27,7 +27,7 @@ public:
 
     json::array GetRelationships(const std::map<std::string, std::string>& filters);
 
-    void AddLevel(const json::object& level);
+    json::object AddLevel(const json::object& level);
 
     boost::json::object AddCi(const json::object& ci);
 
@@ -35,7 +35,7 @@ public:
 
     void AddRelationships(const json::array& relationships);
 
-    void DeleteLevel(int id);
+    json::object DeleteLevel(int id);
 
     void DeleteCi(const std::map<std::string, std::string>& filters);
 

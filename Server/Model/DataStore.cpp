@@ -76,8 +76,21 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
         return json::array();
     }
 
-    void DataStore::AddLevel(const json::object& level) {
-        // Заглушка: ничего не делает
+    json::object DataStore::AddLevel(const json::object& level) {
+        json::object result;
+
+        if (!level.contains("name")) {
+            result["status"] = "failure";
+            result["error"] = "оОтсутствует тег name";
+        }
+
+        std::string name = boost::json::value_to<std::string>(level.at("name"));
+        int levelNum = cmdb_.addLevel(name);
+
+        result["id"] = levelNum;
+        result["name"] = name;
+
+        return result;
     }
 
     boost::json::object DataStore::AddCi(const boost::json::object& ci) {
@@ -137,8 +150,19 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
         // Заглушка: ничего не делает
     }
 
-    void DataStore::DeleteLevel(int id) {
-        // Заглушка: ничего не делает
+    json::object DataStore::DeleteLevel(int id) {
+        json::object result;
+        std::cout<< "DELETE LEVEL " << id << std::endl;
+        
+        result["status"] = "success";
+        result["message"] = "Удален";
+
+        if (!cmdb_.removeLevel(id)) {
+            result["status"] = "failure";
+            result["error"] = "Ошибка удаления уровня: " + id;
+        }
+
+        return result;
     }
 
     void DataStore::DeleteCi(const std::map<std::string, std::string>& filters) {
@@ -185,13 +209,7 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
 // bool DataStore::UpdateRecord(int id, const json::object& record) {
 //     if (data_.find(id) == data_.end()) return false;
 //     for (auto& [key, value] : record) {
-//         data_[id][key] = value.as_string();
-//     }
-//     return true;
-// }
-
-// json::object DataStore::GetAllRecords() const {
-//     json::object result;
+//         data_[id][key] = value.as_sci.contains("id")
 //     for (const auto& [id, record] : data_) {
 //         json::object record_json;
 //         for (const auto& [key, value] : record) {
