@@ -67,8 +67,16 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
     }
 
     json::array DataStore::GetCi(const std::map<std::string, std::string>& filters) {
-        // Заглушка: возвращает пустой JSON-массив
-        return json::array();
+        std::shared_ptr<std::vector<cmdb::CMDB::CIPtr>> cis = cmdb_.getCIs(filters);
+
+        json::array result;
+        for (const auto& ci : *cis) {
+            json::object ciObject;
+            ciObject = ci->asJSON();
+            result.push_back(ciObject);
+        }
+
+        return result;
     }
 
     json::array DataStore::GetRelationships(const std::map<std::string, std::string>& filters) {

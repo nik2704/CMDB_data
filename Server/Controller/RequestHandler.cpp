@@ -89,22 +89,14 @@ void RequestHandler::HandleGetLevel(http::request<http::string_body>& req, http:
 }
 
 void RequestHandler::HandleGetCi(http::request<http::string_body>& req, http::response<http::string_body>& res) {
-    std::map<std::string, std::string> query_params;
-    std::string_view target = req.target();
-    size_t query_start = target.find('?');
-    if (query_start != std::string_view::npos) {
-        std::string query_string(target.substr(query_start + 1));
-        std::stringstream ss(query_string);
-        std::string item;
-        while (std::getline(ss, item, '&')) {
-            size_t equals_pos = item.find('=');
-            if (equals_pos != std::string::npos) {
-                query_params[item.substr(0, equals_pos)] = item.substr(equals_pos + 1);
-            }
-        }
-    }
+    std::map<std::string, std::string> query_params = getQueryParams(req);
     json::array cis = store_.GetCi(query_params);
-    ResponseFormatter::MakeJSONResponse(res, cis);
+
+    if (!cis.empty()) {
+        ResponseFormatter::MakeJSONResponse(res, cis);
+    } else {
+        ResponseFormatter::MakeErrorResponse(res, http::status::not_found, "Не найдено");
+    }
 }
 
 void RequestHandler::HandleGetRelationships(http::request<http::string_body>& req, http::response<http::string_body>& res) {

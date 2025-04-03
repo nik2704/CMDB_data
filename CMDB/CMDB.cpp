@@ -192,6 +192,49 @@ std::shared_ptr<std::vector<CMDB::CIPtr>> CMDB::getCIs(const std::string& type) 
     return getCIsImpl([type](const CIPtr& ci) { return ci->getType() == type; });
 }
 
+std::shared_ptr<std::vector<CMDB::CIPtr>> CMDB::getCIs(const std::map<std::string, std::string>& filters) const {
+    auto result = std::make_shared<std::vector<CIPtr>>();
+    std::string id;
+    std::string name;
+    std::string type;
+    int level = -1;
+
+    if (filters.empty()) {
+        result = getCIs();
+    } else {
+        if (filters.count("id") > 0) {
+            id = filters.at("id");
+        }
+
+        if (filters.count("name") > 0) {
+            name = filters.at("name");
+        }
+
+        if (filters.count("type") > 0) {
+            type = filters.at("type");
+        }
+
+        if (filters.count("level") > 0) {
+            level = std::stoi(filters.at("level"));
+        }
+
+        auto allCIs = getCIs();
+
+        for (const auto& ci : *allCIs) {
+            std::cout << "ci->getId() = [" << ci->getId() << "], id = [" << id << "]" << std::endl;
+            if ((id.empty() || ci->getId() == id) &&
+                (name.empty() || ci->getName() == name) &&
+                (type.empty() || ci->getType() == type) &&
+                (level == -1 || ci->getLevel() == level)) {
+                result->push_back(ci);
+            }
+        }        
+    }
+
+    return result;
+}
+
+
 std::shared_ptr<std::vector<CMDB::CIPtr>> CMDB::getCIs(const std::string& id, size_t steps) const {
     std::lock_guard<std::mutex> lock(cis_mutex_);
     std::lock_guard<std::mutex> lock_dependencies(dependencies_mutex_);

@@ -16,6 +16,7 @@
 #include <fstream>
 #include <filesystem>
 #include <deque>
+#include <map>
 #include <memory>
 #include <optional>
 #include <queue>
@@ -213,6 +214,14 @@ public:
      * @return Указатель на вектор указателей на конфигурационные единицы.
      */
     std::shared_ptr<std::vector<CIPtr>> getCIs(const std::string& type) const;
+
+    /**
+     * @brief Получить список конфигурационных единиц по произвольному запросу.
+     *
+     * @param filters фильтры (поле - значение).
+     * @return Указатель на вектор указателей на конфигурационные единицы.
+     */
+    std::shared_ptr<std::vector<CMDB::CIPtr>> getCIs(const std::map<std::string, std::string>& filters) const;
 
     /**
      * @brief Получить список конфигурационных единиц, связанных с указанной CI на заданное количество шагов.
