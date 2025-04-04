@@ -37,14 +37,86 @@ boost::json::object CI::asJSON() const {
 }
 
 
-void CI::setName(const std::string& name) { name_ = name; }
-void CI::setLevel(int level) { level_ = level; }
-void CI::setProperty(const std::string& key, const std::string& value) {
-    properties_[key] = value;
+bool CI::setName(const std::string& name) { 
+    if (name_ == name) return false;
+
+    name_ = name;
+    return true;
 }
+
+bool CI::setLevel(int level) {
+    if (level_ == level) return false;
+
+    level_ = level;
+    return true;
+}
+
+bool CI::setProperty(const std::string& key, const std::optional<std::string>& value) {
+    if (!value) {
+        auto it = properties_.find(key);
+        if (it != properties_.end()) {
+            properties_.erase(it);
+            return true;
+        }
+        return false;
+    }
+
+    auto it = properties_.find(key);
+    if (it != properties_.end()) {
+        if (it->second == *value) return false;
+        it->second = *value;
+        return true;
+    } else {
+        properties_[key] = *value;
+        return true;
+    }
+
+    return false;
+}
+
+
 void CI::setProperties(const std::unordered_map<std::string, std::string>& properties) {
     properties_ = properties;
 }
+
+bool CI::setProperties(const boost::json::object& update_ci, std::string& message) {
+    bool changed = false;
+
+    if (!update_ci.contains("id") || !update_ci.at("id").is_string()) {
+        message = "Поле 'id' обязательно и должно быть строкой.";
+        return false;
+    }
+
+    if (update_ci.contains("name") && update_ci.at("name").is_string()) {
+        std::string newName = boost::json::value_to<std::string>(update_ci.at("name"));
+        if (setName(newName)) changed = true;
+    }
+
+    if (update_ci.contains("level") && update_ci.at("level").is_int64()) {
+        int newLevel = static_cast<int>(update_ci.at("level").as_int64());
+        if (setLevel(newLevel)) changed = true;
+    }
+
+    if (update_ci.contains("properties") && update_ci.at("properties").is_object()) {
+        const auto& props = update_ci.at("properties").as_object();
+        for (const auto& [key, val] : props) {
+            std::string propName = std::string(key);
+
+            if (val.is_null()) {
+                if (setProperty(propName, std::nullopt)) changed = true;  // безопасно
+            } else if (val.is_string()) {
+                std::string propValue = std::string(val.as_string());
+                if (setProperty(propName, propValue)) changed = true;
+            } else {
+                message = "Недопустимое значение свойства '" + propName + "'. Ожидалась строка или null.";
+                return false;
+            }
+        }
+    }
+
+    return changed;
+}
+
 
 bool CI::hasProperty(const std::string& key) const {
     return properties_.find(key) != properties_.end();

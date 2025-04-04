@@ -37,13 +37,13 @@ public:
 
     json::object DeleteLevel(int id);
 
-    void DeleteCi(const std::map<std::string, std::string>& filters);
+    json::object DeleteCi(const std::string& id);
 
     void DeleteRelationships(const std::map<std::string, std::string>& filters);
 
-    void UpdateCi(const json::object& ci);
+    json::object UpdateCi(const json::object& ci);
 
-    void UpdateCis(const json::array& cis);
+    json::object UpdateCis(const json::array& cis);
 
     json::object UpdateLevel(const json::object& level);
 
@@ -56,5 +56,6 @@ private:
     cmdb::CMDB& cmdb_;
 
     bool AddCiToCMDB(const json::object& ci, std::string& message, std::string& ciId);
+    bool UpdateCiInCMDB(const json::object& ci, std::string& message, std::string& ciId);
     bool isCIexists(std::string id);
 };

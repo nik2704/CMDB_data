@@ -130,7 +130,7 @@ void RequestHandler::HandleAddLevel(http::request<http::string_body>& req, http:
         }
         
     } catch (...) {
-        ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "Invalid JSON data");
+        ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "Не корректный JSON");
     }
 }
 
@@ -184,30 +184,32 @@ void RequestHandler::HandleDeleteLevel(http::request<http::string_body>& req, ht
                 ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "Уровень не удален");
             }
         } catch (...) {
-            ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "Invalid id");
+            ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "Не корректный id");
         }
     } else {
-        ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "Missing id");
+        ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "Пропущен id");
     }
 }
 
 void RequestHandler::HandleDeleteCi(http::request<http::string_body>& req, http::response<http::string_body>& res) {
-    std::map<std::string, std::string> query_params;
-    std::string_view target = req.target();
-    size_t query_start = target.find('?');
-    if (query_start != std::string_view::npos) {
-        std::string query_string(target.substr(query_start + 1));
-        std::stringstream ss(query_string);
-        std::string item;
-        while (std::getline(ss, item, '&')) {
-            size_t equals_pos = item.find('=');
-            if (equals_pos != std::string::npos) {
-                query_params[item.substr(0, equals_pos)] = item.substr(equals_pos + 1);
+    std::map<std::string, std::string> query_params =getQueryParams(req);
+
+    if (query_params.count("id")) {
+        try {
+            std::string id = query_params["id"];
+            auto result = store_.DeleteCi(id);
+
+            if (isResultSuccess(result)) {
+                ResponseFormatter::MakeJSONResponse(res, result);
+            } else {
+                ResponseFormatter::MakeErrorResponse(res, http::status::not_found, "CI не удален");
             }
+        } catch (...) {
+            ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "Не корректный id");
         }
+    } else {
+        ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "Пропущен id");
     }
-    store_.DeleteCi(query_params);
-    ResponseFormatter::MakeJSONResponse(res, json::object{{"status", "success"}});
 }
 
 void RequestHandler::HandleDeleteRelationships(http::request<http::string_body>& req, http::response<http::string_body>& res) {
@@ -232,16 +234,26 @@ void RequestHandler::HandleDeleteRelationships(http::request<http::string_body>&
 void RequestHandler::HandleUpdateCi(http::request<http::string_body>& req, http::response<http::string_body>& res) {
     try {
         auto json_data = json::parse(req.body());
+        boost::json::object result;
+
         if (json_data.is_array()) {
-            store_.UpdateCis(json_data.as_array());
+            result = store_.UpdateCis(json_data.as_array());
         } else if (json_data.is_object()) {
-            store_.UpdateCi(json_data.as_object());
+            result = store_.UpdateCi(json_data.as_object());            
         } else {
-            throw std::runtime_error("Invalid JSON data");
+            throw std::runtime_error("Не корректный JSON");
         }
-        ResponseFormatter::MakeJSONResponse(res, json::object{{"status", "success"}});
+
+        if (isResultSuccess(result)) {
+            ResponseFormatter::MakeJSONResponse(res, result);
+        } else{
+            ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "КЕ не обновлен(ы)");
+        }
+
+    } catch (const std::exception& e) {
+        ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, e.what());
     } catch (...) {
-        ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "Invalid JSON data");
+        ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "Не корректный JSON");
     }
 }
 

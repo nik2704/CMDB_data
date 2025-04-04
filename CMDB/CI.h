@@ -102,23 +102,26 @@ public:
      * @brief Установить имя конфигурационной единицы.
      *
      * @param name Новое имя конфигурационной единицы.
+     * @return true если изменено
      */
-    void setName(const std::string& name);
+    bool setName(const std::string& name);
 
     /**
      * @brief Установить уровень конфигурационной единицы.
      *
      * @param level Новый уровень конфигурационной единицы.
+     * @return true если изменено
      */
-    void setLevel(int level);
+    bool setLevel(int level);
 
     /**
      * @brief Установить свойство конфигурационной единицы.
      *
      * @param key Свойство.
      * @param value Значение свойства.
+     * @return true если изменено
      */
-    void setProperty(const std::string& key, const std::string& value);
+    bool setProperty(const std::string& key, const std::optional<std::string>& value);
 
     /**
      * @brief Установить набор свойств конфигурационной единицы.
@@ -126,6 +129,15 @@ public:
      * @param properties Новый набор свойств конфигурационной единицы.
      */
     void setProperties(const std::unordered_map<std::string, std::string>& properties);
+
+    /**
+     * @brief Установить набор свойств конфигурационной единицы по объекту JSON.
+     *
+     * @param update_ci JSON обновления конфигурационной единицы.
+     * @param message возврат сообщения
+     * @return true если что-то изменено
+     */
+    bool setProperties(const boost::json::object& update_ci, std::string& message);
 
     /**
      * @brief Проверить, существует ли свойство с указанным ключом.

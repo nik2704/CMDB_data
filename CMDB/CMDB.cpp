@@ -221,7 +221,6 @@ std::shared_ptr<std::vector<CMDB::CIPtr>> CMDB::getCIs(const std::map<std::strin
         auto allCIs = getCIs();
 
         for (const auto& ci : *allCIs) {
-            std::cout << "ci->getId() = [" << ci->getId() << "], id = [" << id << "]" << std::endl;
             if ((id.empty() || ci->getId() == id) &&
                 (name.empty() || ci->getName() == name) &&
                 (type.empty() || ci->getType() == type) &&
@@ -464,6 +463,10 @@ std::shared_ptr<std::vector<CMDB::RelationshipPtr>> CMDB::getDependentCIs(const 
 /*
 *   BEGIN: Методы для сохранения в файл
 */
+
+void CMDB::markAsModified() {
+    modified_ = true;
+}
 
 bool CMDB::saveCollection(std::ofstream& out, const CIList& collection) {
     size_t size = collection.size();

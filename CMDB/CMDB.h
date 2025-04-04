@@ -349,6 +349,11 @@ public:
     bool saveToFile();
 
     /**
+     * @brief Необходимость сохрания данных CMDB в файл.
+     */
+    void markAsModified();
+
+    /**
      * @brief Сохранить данные CMDB в указанный файл.
      *
      * @param filename Имя файла для сохранения.

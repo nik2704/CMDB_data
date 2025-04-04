@@ -175,7 +175,7 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
             if (!ciValue.is_object()) {
                 entry["id"] = nullptr;
                 entry["message"] = "Элемент не является объектом JSON.";
-                
+
                 cis_add.push_back(entry);
                 continue;
             }
@@ -225,20 +225,112 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
         return result;
     }
 
-    void DataStore::DeleteCi(const std::map<std::string, std::string>& filters) {
-        // Заглушка: ничего не делает
+    json::object DataStore::DeleteCi(const std::string& id) {
+        json::object result;
+
+        result["status"] = "success";
+        result["message"] = "Удален";
+
+        if (!cmdb_.removeCI(id)) {
+            result["status"] = "failure";
+            result["error"] = "Ошибка удаления CI: " + id;
+        }
+
+        return result;
     }
 
     void DataStore::DeleteRelationships(const std::map<std::string, std::string>& filters) {
         // Заглушка: ничего не делает
     }
 
-    void DataStore::UpdateCi(const json::object& ci) {
-        // Заглушка: ничего не делает
+    bool DataStore::UpdateCiInCMDB(const json::object& ci, std::string& message, std::string& ciId) {
+        if (!ci.contains("id")) {
+            message = "Не запонен ID.";
+            return false;
+        }
+
+        ciId = boost::json::value_to<std::string>(ci.at("id"));
+
+        auto current_ci = cmdb_.getCI(ciId);
+
+        if (current_ci == nullptr) {
+            message = "Не найден ID.";
+            return false;
+        }
+
+        bool result = false;
+
+        if (current_ci->setProperties(ci, message)) {
+            result = true;
+            message = "обновлен";
+
+            cmdb_.markAsModified();
+        } else {
+            message = ciId + " не обновлен";
+        }
+
+        return result;
     }
 
-    void DataStore::UpdateCis(const json::array& cis) {
-        // Заглушка: ничего не делает
+    json::object DataStore::UpdateCi(const json::object& ci) {
+        boost::json::object result;
+        result["ci"] = ci;
+        result["status"] = "success";
+        result["id"] = "unknown";
+
+        std::string message;
+        std::string id;
+
+        if (!UpdateCiInCMDB(ci, message, id)) {
+            result["status"] = "failure";
+        }
+
+        result["message"] = message;
+        result["id"] = id;
+
+        return result;
+    }
+
+    json::object DataStore::UpdateCis(const json::array& cis) {
+        boost::json::object result;
+        boost::json::array cis_add;
+        int updatedCount = 0;
+
+        for (const auto& ciValue : cis) {
+            boost::json::object entry;
+
+            if (!ciValue.is_object()) {
+                entry["id"] = nullptr;
+                entry["message"] = "Элемент не является объектом JSON.";
+
+                cis_add.push_back(entry);
+                continue;
+            }
+
+            const boost::json::object& ci = ciValue.as_object();
+            std::string message;
+            std::string ciId = "unknown";
+
+            if (UpdateCiInCMDB(ci, message, ciId)) {
+                ++updatedCount;
+            }
+
+            entry["id"] = ciId;
+            entry["message"] = message;
+
+            cis_add.push_back(entry);
+        }
+
+        result["cis_add"] = cis_add;
+
+        boost::json::object info;
+        info["total"] = static_cast<int>(cis.size());
+        info["updated"] = updatedCount;
+        result["info"] = info;
+
+        result["status"] = updatedCount > 0 ? "success" : "failure";
+
+        return result;
     }
 
     json::object DataStore::UpdateLevel(const json::object& level) {
