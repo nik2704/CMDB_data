@@ -9,6 +9,10 @@ Server::Server(int port, size_t thread_count)
       data_store_(cmdb_),
       handler_(data_store_) {}
 
+Server::~Server() {
+    cmdb_.saveToFile();
+}
+
 void Server::Run() {
     std::cout << "HTTP сервер запущен на порту " << acceptor_.local_endpoint().port() << "\n";
     AcceptConnections();

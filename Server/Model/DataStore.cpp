@@ -258,18 +258,7 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
             return false;
         }
 
-        bool result = false;
-
-        if (current_ci->setProperties(ci, message)) {
-            result = true;
-            message = "обновлен";
-
-            cmdb_.markAsModified();
-        } else {
-            message = ciId + " не обновлен";
-        }
-
-        return result;
+        return cmdb_.updateCI(current_ci, ci, message);
     }
 
     json::object DataStore::UpdateCi(const json::object& ci) {

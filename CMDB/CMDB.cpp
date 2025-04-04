@@ -321,6 +321,20 @@ bool CMDB::updateCI(const std::string& id, const std::string& name, int level, c
     return true;
 }
 
+bool CMDB::updateCI (cmdb::CMDB::CIPtr current_ci, const boost::json::object &ci, std::string &message) {
+    std::lock_guard<std::mutex> lock(cis_mutex_);
+
+    if (current_ci->setProperties(ci, message)) {
+        message = "обновлен";
+        modified_ = true;
+
+        return true;
+    } else {
+        message = current_ci->getId() + " не обновлен";
+        return false;
+    }
+}
+
 bool CMDB::setProperty(const std::string& id, const std::string& property_name, const std::string& property_value) {
     auto ci = getCI(id);
     if (!ci) return false;

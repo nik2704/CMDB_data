@@ -253,6 +253,15 @@ public:
     bool updateCI(const std::string& id, const std::string& name, int level, const std::unordered_map<std::string, std::string>& properties);
 
     /**
+     * @brief Обновить свойства конфигурационной единицы.
+     *
+     * @param ci JSON объект конфигурационной единицы.
+     * @param message Результат обновления.
+     * @return true, если обновление прошло успешно, иначе false.
+     */
+    bool updateCI (cmdb::CMDB::CIPtr current_ci, const boost::json::object &ci, std::string &message);
+
+    /**
      * @brief Установить свойство конфигурационной единицы.
      *
      * @param id Идентификатор конфигурационной единицы.

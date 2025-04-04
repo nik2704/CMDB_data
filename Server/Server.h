@@ -21,6 +21,8 @@ using tcp = net::ip::tcp;
 class Server {
 public:
     Server(int port, size_t thread_count);
+    ~Server();
+    
     void Run();
 private:
     void AcceptConnections();
