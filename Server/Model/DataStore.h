@@ -31,7 +31,7 @@ public:
 
     boost::json::object AddCi(const json::object& ci);
 
-     boost::json::object AddCis(const json::array& cis);
+    boost::json::object AddCis(const json::array& cis);
 
     void AddRelationships(const json::array& relationships);
 
@@ -55,5 +55,6 @@ private:
     std::unordered_map<int, std::unordered_map<std::string, std::string>> data_;
     cmdb::CMDB& cmdb_;
 
+    bool AddCiToCMDB(const json::object& ci, std::string& message, std::string& ciId);
     bool isCIexists(std::string id);
 };

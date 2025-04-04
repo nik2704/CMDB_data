@@ -101,58 +101,111 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
         return result;
     }
 
-    boost::json::object DataStore::AddCi(const boost::json::object& ci) {
-        boost::json::object result = ci;
-        result["status"] = "failure";
-
-        try {
-            if (!ci.contains("id") || !ci.contains("name") || !ci.contains("type") || !ci.contains("level")) {
-                throw std::runtime_error("Не запонены обязательные поля.");
-            }
-
-            std::string id = boost::json::value_to<std::string>(ci.at("id"));
-            std::string name = boost::json::value_to<std::string>(ci.at("name"));
-            std::string ciType = boost::json::value_to<std::string>(ci.at("type"));
-            int level = boost::json::value_to<int>(ci.at("level"));
-
-            if (isCIexists(id)) {
-                throw std::runtime_error("КЕ с таким id " + id + " уже существует.");
-            }
-
-            std::unordered_map<std::string, std::string> properties;
-            if (ci.contains("properties")) {
-                if (!ci.at("properties").is_object()) {
-                    throw std::runtime_error("Data Store (AddCi): Свойства должны быть объектом JSON.");
-                }
-
-                auto propertiesJson = ci.at("properties").as_object();
-
-                for (auto it = propertiesJson.begin(); it != propertiesJson.end(); ++it) {
-                    if (!it->value().is_string()) {
-                        throw std::runtime_error("Значение свойства должны быть строковыми.");
-                    }
-                    properties[it->key()] = boost::json::value_to<std::string>(it->value());
-                }
-            }
-
-            if (!cmdb_.addCI(id, name, ciType, level, properties)) {
-                throw std::runtime_error("Ошибка добавления КЕ в CMDB.");
-            }
-
-            result["status"] = "success";
-        } catch (const std::exception& e) {
-            result["error"] = e.what();
-            std::cerr << "Ошибка добавления КЕ: " << e.what() << std::endl;
+    bool DataStore::AddCiToCMDB(const json::object& ci, std::string& message, std::string& ciId) {
+        if (!ci.contains("id") || !ci.contains("name") || !ci.contains("type") || !ci.contains("level")) {
+            message = "Не запонены обязательные поля.";
+            return false;
         }
 
+        ciId = boost::json::value_to<std::string>(ci.at("id"));
+        std::string name = boost::json::value_to<std::string>(ci.at("name"));
+        std::string ciType = boost::json::value_to<std::string>(ci.at("type"));
+        int level = boost::json::value_to<int>(ci.at("level"));
+
+        if (isCIexists(ciId)) {
+            message = "КЕ с таким id " + ciId + " уже существует.";
+            return false;
+        }
+
+        std::unordered_map<std::string, std::string> properties;
+        if (ci.contains("properties")) {
+            if (!ci.at("properties").is_object()) {
+                message = "Data Store (AddCi): Свойства должны быть объектом JSON.";
+                return false;
+            }
+
+            auto propertiesJson = ci.at("properties").as_object();
+
+            for (auto it = propertiesJson.begin(); it != propertiesJson.end(); ++it) {
+                if (!it->value().is_string()) {
+                    message = "Значение свойства должны быть строковыми.";
+                    return false;
+                }
+
+                properties[it->key()] = boost::json::value_to<std::string>(it->value());
+            }
+        }
+
+        if (!cmdb_.addCI(ciId, name, ciType, level, properties)) {
+            message = "Ошибка добавления КЕ в CMDB.";
+            return false;
+        }
+
+        message = ciId + " добавлен";
+
+        return true;
+    }
+
+    boost::json::object DataStore::AddCi(const boost::json::object& ci) {
+        boost::json::object result = ci;
+        result["status"] = "success";
+        result["id"] = "unknown";
+
+        std::string message;
+        std::string id;
+
+        if (!AddCiToCMDB(ci, message, id)) {
+            result["status"] = "failure";
+        }
+
+        result["message"] = message;
+        result["id"] = id;
+
         return result;
     }
 
-     boost::json::object DataStore::AddCis(const json::array& cis) {
-         boost::json::object result;
-        // Заглушка: ничего не делает
+    boost::json::object DataStore::AddCis(const boost::json::array& cis) {
+        boost::json::object result;
+        boost::json::array cis_add;
+        int addedCount = 0;
+
+        for (const auto& ciValue : cis) {
+            boost::json::object entry;
+
+            if (!ciValue.is_object()) {
+                entry["id"] = nullptr;
+                entry["message"] = "Элемент не является объектом JSON.";
+                
+                cis_add.push_back(entry);
+                continue;
+            }
+
+            const boost::json::object& ci = ciValue.as_object();
+            std::string message;
+            std::string ciId = "unknown";
+
+            if (AddCiToCMDB(ci, message, ciId)) {
+                ++addedCount;
+            }
+
+            entry["id"] = ciId;
+            entry["message"] = message;
+
+            cis_add.push_back(entry);
+        }
+
+        result["cis_add"] = cis_add;
+
+        boost::json::object info;
+        info["total"] = static_cast<int>(cis.size());
+        info["added"] = addedCount;
+        result["info"] = info;
+
+        result["status"] = addedCount > 0 ? "success" : "failure";
+
         return result;
     }
+
 
     void DataStore::AddRelationships(const json::array& relationships) {
         // Заглушка: ничего не делает
