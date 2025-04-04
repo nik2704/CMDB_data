@@ -55,6 +55,11 @@ public:
     using CIMap = std::unordered_map<std::string, CIPtr>;
 
     /**
+     * @brief Тип карты свойств конфигурационных единиц к списку указателей на КЕ, которые данные свойства содержат.
+     */
+    using CIPropertyMap = std::unordered_map<std::string, CIList>;
+
+    /**
      * @brief Тип карты связей между конфигурационными единицами.
      */
     using RelationshipMap = std::unordered_multimap<std::string, Relationship>;
@@ -390,10 +395,16 @@ public:
      */
     bool loadFromFile(const std::string& filename);
 
+    /**
+     * @brief Получение списка свойств.
+     */
+    boost::json::array getProps() const;
+
 private:
     std::string filename_; ///< Имя файла для сохранения и загрузки данных.
     CIList all_cis_; ///< Список всех конфигурационных единиц.
     CIMap id_to_ci_; ///< Карта идентификаторов конфигурационных единиц к указателям.
+    CIPropertyMap property_to_cis_; ///< Карта свойств конфигурационных единиц к списку указателей на КЕ.
     std::vector<std::string> levels_; ///< Список уровней конфигурационных единиц.
     RelationshipMap relationships_; ///< Карта связей между конфигурационными единицами.
     ReverseIndex reverse_index_; ///< Обратный индекс для поиска зависимых CI.
@@ -497,9 +508,31 @@ private:
     void restoreReverseIndex();
 
     /**
+     * @brief Восстановить карту свойств и CI.
+     */
+    void restorePropertiesMap();
+
+    /**
      * @brief Цикл автоматического сохранения данных CMDB.
      */
     void autoSaveLoop();
+
+    /**
+     * @brief Обновление карты свойств.
+     */
+    void updatePropertiesMap(CIPtr ci, const std::unordered_map<std::string, std::string>& properties);
+
+    /**
+     * @brief Удаление свойства из карты свойств.
+     */
+    void deletePropertyFromMap(CIPtr ci, const std::string& property_name);
+
+    void deletePropertiesMap(CIPtr ci, const std::unordered_map<std::string, std::string>& properties);
+
+    /**
+     * @brief Создание или дополнение свойства в карты свойств.
+     */
+    void addPropertyToMap(CIPtr ci, const std::string& property_name, const std::string& property_value);
 };
 
 /**

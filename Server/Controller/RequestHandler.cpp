@@ -43,6 +43,12 @@ void RequestHandler::HandleRequest(http::request<http::string_body>& req, http::
             } else {
                 ResponseFormatter::MakeErrorResponse(res, http::status::method_not_allowed, "Метод не разрешен");
             }
+        } else if (sub_target == "/props") {
+            if (req.method() == http::verb::get) {
+                HandleGetProps(req, res);
+            } else {
+                ResponseFormatter::MakeErrorResponse(res, http::status::method_not_allowed, "Метод не разрешен");
+            }
         } else if (sub_target == "/relationship") {
             if (req.method() == http::verb::get) {
                 HandleGetRelationships(req, res);
@@ -329,6 +335,13 @@ bool RequestHandler::isResultSuccess(json::object& result) {
     if (status != "success") return false;
 
     return true;
+}
+
+void RequestHandler::HandleGetProps(http::request<http::string_body>& req, http::response<http::string_body>& res) {
+    boost::json::object result;
+
+    result = store_.GetPropsList();
+    ResponseFormatter::MakeJSONResponse(res, result);    
 }
 
 // void RequestHandler::fillFailureInfo(json::object& internal_result, boost::json::object & result) {

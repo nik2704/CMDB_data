@@ -47,6 +47,8 @@ public:
 
     json::object UpdateLevel(const json::object& level);
 
+    json::object GetPropsList();
+
     int AddRecord(const json::object& record);
 
     bool UpdateRecord(int id, const json::object& record);

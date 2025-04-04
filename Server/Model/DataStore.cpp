@@ -344,7 +344,16 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
         updt_level["name"] = name;
         result["level"] = updt_level;
 
-        return result;    }
+        return result;
+    }
+
+    json::object DataStore::GetPropsList() {
+        json::object result;
+        
+        result["properties"] = cmdb_.getProps();
+
+        return result;
+    }
 
     int DataStore::AddRecord(const json::object& record) {
         // Заглушка: возвращает 0

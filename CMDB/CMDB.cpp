@@ -66,10 +66,13 @@ bool CMDB::addCI(
     if (level >= levels_.size()) {
         return false;
     }
+    std::lock_guard<std::mutex> lock(cis_mutex_);
 
     auto ci = std::make_shared<CI>(id, name, type, level, properties);
     all_cis_.push_back(ci);
     id_to_ci_[id] = ci;
+
+    updatePropertiesMap(ci, ci->getProperties());
 
     modified_ = true;
 
@@ -142,6 +145,7 @@ bool CMDB::removeCI(const std::string& id) {
     auto it = id_to_ci_.find(id);
     if (it == id_to_ci_.end()) return false;
 
+    std::lock_guard<std::mutex> lock(cis_mutex_);
     auto ciPtr = it->second;
     
     id_to_ci_.erase(it);
@@ -149,6 +153,7 @@ bool CMDB::removeCI(const std::string& id) {
     all_cis_.erase(std::remove_if(all_cis_.begin(), all_cis_.end(), [&ciPtr](const CIPtr& ptr) { return ptr == ciPtr; }), all_cis_.end());
 
     removeRelationshipsForId(id);
+    deletePropertiesMap(ciPtr, ciPtr->getProperties());
 
     modified_ = true;
 
@@ -302,6 +307,7 @@ bool CMDB::updateCI(const std::string& id, const std::unordered_map<std::string,
     if (!ci) return false;
     
     ci->setProperties(properties);
+    updatePropertiesMap(ci, ci->getProperties());
 
     modified_ = true;
 
@@ -315,6 +321,7 @@ bool CMDB::updateCI(const std::string& id, const std::string& name, int level, c
     ci->setName(name);
     ci->setLevel(level);
     ci->setProperties(properties);
+    updatePropertiesMap(ci, ci->getProperties());
 
     modified_ = true;
 
@@ -324,7 +331,20 @@ bool CMDB::updateCI(const std::string& id, const std::string& name, int level, c
 bool CMDB::updateCI (cmdb::CMDB::CIPtr current_ci, const boost::json::object &ci, std::string &message) {
     std::lock_guard<std::mutex> lock(cis_mutex_);
 
+    auto current_props = current_ci->getProperties();
+
     if (current_ci->setProperties(ci, message)) {
+
+        auto new_props = current_ci->getProperties();
+
+        for (const auto& [key, value] : current_props) {
+            if (new_props.find(key) == new_props.end()) {
+                deletePropertyFromMap(current_ci, key);
+            }
+        }
+
+        updatePropertiesMap(current_ci, new_props);
+
         message = "обновлен";
         modified_ = true;
 
@@ -340,10 +360,69 @@ bool CMDB::setProperty(const std::string& id, const std::string& property_name, 
     if (!ci) return false;
 
     ci->setProperty(property_name, property_value);
+    addPropertyToMap(ci, property_name, property_value);
 
     modified_ = true;
 
     return true;
+}
+
+
+void CMDB::updatePropertiesMap(CIPtr ci, const std::unordered_map<std::string, std::string>& properties) {
+    for (const auto& [property_name, property_value] : properties) {
+        CIList& ci_list = property_to_cis_[property_name];
+
+        if (std::find(ci_list.begin(), ci_list.end(), ci) == ci_list.end()) {
+            ci_list.push_back(ci);
+        }
+    }
+}
+
+void CMDB::deletePropertyFromMap(CIPtr ci, const std::string& property_name) {
+    auto it = property_to_cis_.find(property_name);
+    if (it != property_to_cis_.end()) {
+        CIList& ci_list = it->second;
+
+        ci_list.erase(std::remove(ci_list.begin(), ci_list.end(), ci), ci_list.end());
+
+        if (ci_list.empty()) {
+            property_to_cis_.erase(it);
+        }
+    }
+}
+
+void CMDB::deletePropertiesMap(CIPtr ci, const std::unordered_map<std::string, std::string>& properties) {
+    for (const auto& [property_name, property_value] : properties) {
+        deletePropertyFromMap(ci, property_name);
+    }
+}
+    
+void CMDB::addPropertyToMap(CIPtr ci, const std::string& property_name, const std::string& property_value) {
+    CIList& ci_list = property_to_cis_[property_name];
+
+    if (std::find(ci_list.begin(), ci_list.end(), ci) == ci_list.end()) {
+        ci_list.push_back(ci);
+    }
+}
+
+void CMDB::restorePropertiesMap() {
+    property_to_cis_.clear();
+
+    for (const auto& ci : all_cis_) {
+        if (ci) {
+            updatePropertiesMap(ci, ci->getProperties());
+        }
+    }
+}
+
+boost::json::array CMDB::getProps() const {
+    boost::json::array props_array;
+
+    for (const auto& [property_name, ci_list] : property_to_cis_) {
+        props_array.emplace_back(property_name);
+    }
+
+    return props_array;
 }
 
 // END: Методы для работы с CI
@@ -705,6 +784,8 @@ bool CMDB::loadFromFile(const std::string& filename) {
         }
 
         restoreIDtoCI();
+
+        restorePropertiesMap();
 
         restoreReverseIndex();
     }
