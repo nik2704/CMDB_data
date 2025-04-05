@@ -80,8 +80,17 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
     }
 
     json::array DataStore::GetRelationships(const std::map<std::string, std::string>& filters) {
-        // Заглушка: возвращает пустой JSON-массив
-        return json::array();
+        std::shared_ptr<std::vector<cmdb::CMDB::RelationshipPtr>> rels = cmdb_.getRelationships(filters);
+
+        json::array result;
+        for (const auto& rel : *rels) {
+            
+            json::object ciObject;
+            ciObject = rel->asJSON();
+            result.push_back(ciObject);
+        }
+
+        return result;
     }
 
     json::object DataStore::AddLevel(const json::object& level) {
@@ -206,9 +215,83 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
         return result;
     }
 
+    bool DataStore::AddRelationshipToCMDB(const json::object& ci, std::string& message) {
+        if (!ci.contains("source") || !ci.contains("destination") || !ci.contains("type")) {
+            message = "Не запонены обязательные поля.";
+            return false;
+        }
 
-    void DataStore::AddRelationships(const json::array& relationships) {
-        // Заглушка: ничего не делает
+        std::string source = boost::json::value_to<std::string>(ci.at("source"));
+        std::string destination = boost::json::value_to<std::string>(ci.at("destination"));
+        std::string type = boost::json::value_to<std::string>(ci.at("type"));
+        
+        if (!cmdb_.addRelationship(source, destination, type)) {
+            message = "НЕ добавлено";    
+            return false;
+        }
+
+        message = "добавлено";
+        return true;
+    }
+
+    boost::json::object DataStore::AddRelationship(const boost::json::object& relationship) {
+        boost::json::object result;
+
+        result["relationship"] = relationship;
+        result["status"] = "success";
+
+        std::string message;
+        std::string from;
+        std::string to;
+
+        if (!AddRelationshipToCMDB(relationship, message)) {
+            result["status"] = "failure";
+        }
+
+        result["message"] = message;
+
+        return result;
+    }
+
+    boost::json::object DataStore::AddRelationships(const json::array& relationships) {
+        boost::json::object result;
+        boost::json::array rel_add;
+        int addedCount = 0;
+
+        for (const auto& relationshipValue : relationships) {
+            boost::json::object entry;
+
+            if (!relationshipValue.is_object()) {
+                entry["relationship"] = relationshipValue;
+                entry["message"] = "Элемент не является объектом JSON.";
+
+                rel_add.push_back(entry);
+                continue;
+            }
+
+            const boost::json::object& rel = relationshipValue.as_object();
+            std::string message;
+
+            if (AddRelationshipToCMDB(rel, message)) {
+                ++addedCount;
+            }
+
+            entry["relationship"] = relationshipValue;
+            entry["message"] = message;
+
+            rel_add.push_back(entry);
+        }
+
+        result["rels_add"] = rel_add;
+
+        boost::json::object info;
+        info["total"] = static_cast<int>(rel_add.size());
+        info["added"] = addedCount;
+        result["info"] = info;
+
+        result["status"] = addedCount > 0 ? "success" : "failure";
+
+        return result;
     }
 
     json::object DataStore::DeleteLevel(int id) {

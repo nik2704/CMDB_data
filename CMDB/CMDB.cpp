@@ -573,6 +573,46 @@ std::shared_ptr<std::vector<CMDB::RelationshipPtr>> CMDB::getRelationships(const
     });
 }
 
+std::shared_ptr<std::vector<CMDB::RelationshipPtr>> CMDB::getRelationships(const std::map<std::string, std::string>& filters) const {
+    auto result = std::make_shared<std::vector<RelationshipPtr>>();
+
+    std::string source;
+    std::string destination;
+    std::string type;
+
+    if (filters.empty()) {
+        auto rels = getRelationships();
+        if (!rels) return result;
+
+        return rels;
+    } else {
+        if (filters.count("source") > 0) {
+            source = filters.at("source");
+        }
+
+        if (filters.count("destination") > 0) {
+            destination = filters.at("destination");
+        }
+
+        if (filters.count("type") > 0) {
+            type = filters.at("type");
+        }
+
+        auto allrelationships = getRelationships();
+
+        if (allrelationships) {
+            for (const auto& rel : *allrelationships) {
+                if ((source.empty() || rel->getSource() == source) &&
+                    (destination.empty() || rel->getDestination() == destination) &&
+                    (type.empty() || rel->getType() == type)) {
+                    result->push_back(rel);
+                }
+            }
+        }
+    }
+
+    return result;
+}
 std::shared_ptr<std::vector<CMDB::RelationshipPtr>> CMDB::getRelationships(const std::string& from_id,
     const std::string& to_id, const std::string& type) const {
     return getRelationshipsImpl([from_id, to_id, type](const RelationshipPtr& relationship) {

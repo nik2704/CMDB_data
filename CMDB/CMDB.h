@@ -345,6 +345,13 @@ public:
     std::shared_ptr<std::vector<CMDB::RelationshipPtr>> getRelationships(const std::string& from_id, const std::string& to_id, const std::string& type) const;
 
     /**
+     * @brief Получить список связей с использованием параметров запроса.
+     *
+     * @param filters Параметры запроса.
+     * @return Указатель на вектор указателей на связи.
+     */
+    std::shared_ptr<std::vector<CMDB::RelationshipPtr>> getRelationships(const std::map<std::string, std::string>& filters) const;
+    /**
      * @brief Получить список зависимых конфигурационных единиц от указанной CI.
      *
      * @param id Идентификатор конфигурационной единицы.

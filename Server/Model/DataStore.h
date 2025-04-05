@@ -33,7 +33,11 @@ public:
 
     boost::json::object AddCis(const json::array& cis);
 
-    void AddRelationships(const json::array& relationships);
+    bool AddRelationshipToCMDB(const json::object& ci, std::string& message);
+
+    boost::json::object AddRelationship(const boost::json::object& relationships);
+    
+    boost::json::object AddRelationships(const json::array& relationships);
 
     json::object DeleteLevel(int id);
 

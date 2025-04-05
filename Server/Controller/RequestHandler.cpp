@@ -106,22 +106,15 @@ void RequestHandler::HandleGetCi(http::request<http::string_body>& req, http::re
 }
 
 void RequestHandler::HandleGetRelationships(http::request<http::string_body>& req, http::response<http::string_body>& res) {
-    std::map<std::string, std::string> query_params;
-    std::string_view target = req.target();
-    size_t query_start = target.find('?');
-    if (query_start != std::string_view::npos) {
-        std::string query_string(target.substr(query_start + 1));
-        std::stringstream ss(query_string);
-        std::string item;
-        while (std::getline(ss, item, '&')) {
-            size_t equals_pos = item.find('=');
-            if (equals_pos != std::string::npos) {
-                query_params[item.substr(0, equals_pos)] = item.substr(equals_pos + 1);
-            }
-        }
-    }
+    std::map<std::string, std::string> query_params =getQueryParams(req);
+
     json::array relationships = store_.GetRelationships(query_params);
-    ResponseFormatter::MakeJSONResponse(res, relationships);
+
+    if (!relationships.empty()) {
+        ResponseFormatter::MakeJSONResponse(res, relationships);
+    } else {
+        ResponseFormatter::MakeErrorResponse(res, http::status::not_found, "Не найдено");
+    }
 }
 
 void RequestHandler::HandleAddLevel(http::request<http::string_body>& req, http::response<http::string_body>& res) {
@@ -168,12 +161,28 @@ void RequestHandler::HandleAddCi(http::request<http::string_body>& req, http::re
 
 void RequestHandler::HandleAddRelationships(http::request<http::string_body>& req, http::response<http::string_body>& res) {
     try {
-        auto json_data = json::parse(req.body()).as_array();
-        store_.AddRelationships(json_data);
-        ResponseFormatter::MakeJSONResponse(res, json::object{{"status", "success"}});
+        auto json_data = json::parse(req.body());
+        boost::json::object result;
+
+        if (json_data.is_array()) {
+            result = store_.AddRelationships(json_data.as_array());
+        } else if (json_data.is_object()) {
+            result = store_.AddRelationship(json_data.as_object());            
+        } else {
+            throw std::runtime_error("Не корректный JSON data");
+        }
+
+        if (isResultSuccess(result)) {
+            ResponseFormatter::MakeJSONResponse(res, result);
+        } else{
+            ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "Связи не добавлен(ы)");
+        }
+
+    } catch (const std::exception& e) {
+        ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, e.what());
     } catch (...) {
         ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "Не корректный JSON");
-    }
+    }    
 }
 
 void RequestHandler::HandleDeleteLevel(http::request<http::string_body>& req, http::response<http::string_body>& res) {
