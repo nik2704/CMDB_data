@@ -43,7 +43,5 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    // Server server(8080, std::thread::hardware_concurrency() * 2, "cmdb.bin");
-    // server.Run();
     return 0;
 }
