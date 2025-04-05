@@ -238,6 +238,14 @@ public:
     std::shared_ptr<std::vector<CIPtr>> getCIs(const std::string& id, size_t steps) const;
 
     /**
+     * @brief Получить список конфигурационных единиц, содержащих хотя бы одно из заданных свойств.
+     *
+     * @param props Вектор свойств, по которым производится фильтрация.
+     * @return Умный указатель на вектор конфигурационных единиц, удовлетворяющих условию.
+     */
+    std::shared_ptr<std::vector<CIPtr>> getCIs(const std::vector<std::string>& props) const;
+
+    /**
      * @brief Обновить свойства конфигурационной единицы.
      *
      * @param id Идентификатор конфигурационной единицы.
@@ -527,12 +535,19 @@ private:
      */
     void deletePropertyFromMap(CIPtr ci, const std::string& property_name);
 
+    /**
+     * @brief Удаление свойств из карты свойств.
+     */
     void deletePropertiesMap(CIPtr ci, const std::unordered_map<std::string, std::string>& properties);
 
     /**
      * @brief Создание или дополнение свойства в карты свойств.
      */
     void addPropertyToMap(CIPtr ci, const std::string& property_name, const std::string& property_value);
+
+    static std::string urlDecode(const std::string& str);
+
+    static std::vector<std::string> splitAndDecode(const std::string& input, char a);
 };
 
 /**

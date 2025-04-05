@@ -223,7 +223,15 @@ std::shared_ptr<std::vector<CMDB::CIPtr>> CMDB::getCIs(const std::map<std::strin
             level = std::stoi(filters.at("level"));
         }
 
-        auto allCIs = getCIs();
+        std::shared_ptr<std::vector<cmdb::CMDB::CIPtr>> allCIs;
+        
+        if (filters.count("has_props") > 0) {
+            auto has_props = splitAndDecode(filters.at("has_props"), ',');
+
+            allCIs = getCIs(has_props);
+        } else {
+            allCIs = getCIs();
+        }
 
         for (const auto& ci : *allCIs) {
             if ((id.empty() || ci->getId() == id) &&
@@ -233,6 +241,49 @@ std::shared_ptr<std::vector<CMDB::CIPtr>> CMDB::getCIs(const std::map<std::strin
                 result->push_back(ci);
             }
         }        
+    }
+
+    return result;
+}
+
+std::shared_ptr<std::vector<CMDB::CIPtr>> CMDB::getCIs(const std::vector<std::string>& props) const {
+    auto result = std::make_shared<std::vector<CIPtr>>();
+    std::unordered_set<std::string> seen_ids;
+
+    std::unordered_set<CIPtr> candidate_cis;
+
+    for (const auto& prop : props) {
+        auto it = property_to_cis_.find(prop);
+        if (it == property_to_cis_.end()) {
+            return std::make_shared<std::vector<CIPtr>>();
+        }
+
+        if (candidate_cis.empty()) {
+            candidate_cis.insert(it->second.begin(), it->second.end());
+        } else {
+            std::unordered_set<CIPtr> intersection;
+            for (const auto& ci_ptr : it->second) {
+                if (candidate_cis.count(ci_ptr)) {
+                    intersection.insert(ci_ptr);
+                }
+            }
+            
+            candidate_cis = std::move(intersection);
+            if (candidate_cis.empty()) {
+                return std::make_shared<std::vector<CIPtr>>();
+            }
+        }
+    }
+
+    for (const auto& ci_ptr : candidate_cis) {
+        const auto& ci_props = ci_ptr->getProperties();
+        bool has_all = std::all_of(props.begin(), props.end(), [&](const std::string& prop) {
+            return ci_props.find(prop) != ci_props.end();
+        });
+
+        if (has_all) {
+            result->push_back(ci_ptr);
+        }
     }
 
     return result;
@@ -819,5 +870,38 @@ void CMDB::autoSaveLoop() {
 }
 
 // END: Методы для сохранения в файл
+
+std::string CMDB::urlDecode(const std::string& str) {
+    std::ostringstream decoded;
+    for (size_t i = 0; i < str.length(); ++i) {
+        if (str[i] == '%' && i + 2 < str.length()) {
+            std::istringstream hex_stream(str.substr(i + 1, 2));
+            int hex = 0;
+            if (hex_stream >> std::hex >> hex) {
+                decoded << static_cast<char>(hex);
+                i += 2;
+            } else {
+                decoded << '%';
+            }
+        } else if (str[i] == '+') {
+            decoded << ' ';
+        } else {
+            decoded << str[i];
+        }
+    }
+    return decoded.str();
+}   
+
+std::vector<std::string> CMDB::splitAndDecode(const std::string& input, char a) {
+    std::vector<std::string> result;
+    std::istringstream ss(input);
+    std::string token;
+
+    while (std::getline(ss, token, a)) {
+        result.push_back(urlDecode(token));
+    }
+
+    return result;
+}
 
 }
