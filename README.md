@@ -13,30 +13,7 @@
 
 Проект имеет следующую структуру:
 
-── CMDB/
-│   ├── CI.cpp
-│   ├── CI.h
-│   ├── CMDB.cpp
-│   ├── CMDB.h
-│   ├── Relationship.cpp
-│   └── Relationship.h
-├── Server/
-│   ├── Controller/
-│   │   ├── RequestHandler.cpp
-│   │   └── RequestHandler.h
-│   ├── Model/
-│   │   ├── DataStore.cpp
-│   │   └── DataStore.h
-│   ├── ThreadPool/
-│   │   ├── ThreadPool.cpp
-│   │   └── ThreadPool.h
-│   ├── View/
-│   │   ├── ResponseFormatter.cpp
-│   │   └── ResponseFormatter.h
-│   ├── Server.cpp
-│   └── Server.h
-├── main.cpp
-└── README.md
+<pre> <code> 📁 cmdb_service ├── main.cpp ├── README.md ├── CMDB/ │ ├── CI.cpp │ ├── CI.h │ ├── CMDB.cpp │ ├── CMDB.h │ ├── Relationship.cpp │ └── Relationship.h ├── Server/ │ ├── Controller/ │ │ ├── RequestHandler.cpp │ │ └── RequestHandler.h │ ├── Model/ │ │ ├── DataStore.cpp │ │ └── DataStore.h │ ├── ThreadPool/ │ │ ├── ThreadPool.cpp │ │ └── ThreadPool.h │ ├── View/ │ │ ├── ResponseFormatter.cpp │ │ └── ResponseFormatter.h │ ├── Server.cpp │ └── Server.h </code> </pre>
 
 * **`CMDB/`:** Содержит реализацию основной логики CMDB, включая классы для представления CI (`CI`), связей (`Relationship`) и самой базы данных (`CMDB`).
 * **`Server/`:** Включает компоненты HTTP-сервера:
