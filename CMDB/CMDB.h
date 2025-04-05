@@ -304,6 +304,16 @@ public:
     bool removeRelationship(const std::string& from_id, const std::string& to_id);
 
     /**
+     * @brief Удалить связь между конфигурационными единицами.
+     *
+     * @param from_id Идентификатор исходной конфигурационной единицы.
+     * @param to_id Идентификатор целевой конфигурационной единицы.
+     * @param type Тип связи.
+     * @return true, если удаление прошло успешно, иначе false.
+     */
+    bool removeRelationship(const std::string& from_id, const std::string& to_id, const std::string& type);
+
+    /**
      * @brief Удалить все связи, связанные с указанной CI.
      *
      * @param id Идентификатор конфигурационной единицы.

@@ -519,6 +519,26 @@ bool CMDB::removeRelationship(const std::string& from_id, const std::string& to_
     return false;
 }
 
+bool CMDB::removeRelationship(const std::string& from_id, const std::string& to_id, const std::string& type) {
+    auto range = relationships_.equal_range(from_id);
+
+    for (auto it = range.first; it != range.second; ++it) {
+        if (it->second.getDestination() == to_id && it->second.getType() == type) {
+            relationships_.erase(it);
+            reverse_index_[to_id].erase(from_id);
+
+            if (reverse_index_[to_id].empty()) {
+                reverse_index_.erase(to_id);
+            }
+
+            modified_ = true;
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void CMDB::removeRelationshipsForId(const std::string& id) {
     for (auto it = relationships_.begin(); it != relationships_.end(); ) {
         if (it->first == id || it->second.getDestination() == id) {

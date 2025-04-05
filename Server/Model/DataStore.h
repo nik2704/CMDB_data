@@ -43,7 +43,7 @@ public:
 
     json::object DeleteCi(const std::string& id);
 
-    void DeleteRelationships(const std::map<std::string, std::string>& filters);
+    boost::json::object DeleteRelationships(const std::map<std::string, std::string>& filters);
 
     json::object UpdateCi(const json::object& ci);
 

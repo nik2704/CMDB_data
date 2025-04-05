@@ -322,8 +322,37 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
         return result;
     }
 
-    void DataStore::DeleteRelationships(const std::map<std::string, std::string>& filters) {
-        // Заглушка: ничего не делает
+    boost::json::object DataStore::DeleteRelationships(const std::map<std::string, std::string>& filters) {
+        json::object result;
+
+        result["status"] = "success";
+        result["message"] = "удалено";
+
+        if (filters.count("source") == 0 || filters.count("destination") == 0) {
+            result["status"] = "failure";
+            result["message"] = "Не запонены обязательные поля.";
+
+            return result;
+        }
+
+        bool deleted = false;
+
+        result["source"] = filters.at("source");
+        result["destination"] = filters.at("destination");
+
+        if (!filters.count("type") == 0) {
+            deleted = cmdb_.removeRelationship(filters.at("source"), filters.at("destination"), filters.at("type"));
+            result["type"] = filters.at("type");
+        }
+
+        deleted = cmdb_.removeRelationship(filters.at("source"), filters.at("destination"));
+
+        if (!deleted) {
+            result["status"] = "failure";
+            result["message"] = "НЕ удалено";
+        }
+
+        return result;
     }
 
     bool DataStore::UpdateCiInCMDB(const json::object& ci, std::string& message, std::string& ciId) {
