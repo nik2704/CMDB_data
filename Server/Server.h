@@ -20,13 +20,14 @@ using tcp = net::ip::tcp;
 
 class Server {
 public:
-    Server(int port, size_t thread_count);
+    Server(int port, size_t thread_count, std::string db);
     ~Server();
     
     void Run();
 private:
     void AcceptConnections();
     void Session(std::shared_ptr<tcp::socket> socket);
+    std::string db_;
     net::io_context ioc_;
     tcp::acceptor acceptor_;
     ThreadPool pool_;

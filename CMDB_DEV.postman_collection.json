@@ -1,0 +1,656 @@
+{
+	"info": {
+		"_postman_id": "2ac74ebd-c2f5-4327-b413-aac0b2b43ad9",
+		"name": "CMDB_DEV",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "9692920"
+	},
+	"item": [
+		{
+			"name": "1. Get all",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/data/all",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"data",
+						"all"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2. Get all Levels",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/data/level",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"data",
+						"level"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "3. Get a Level 0",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/data/level?id=1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"data",
+						"level"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4. Get a Level 1",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/data/level?id=1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"data",
+						"level"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "5. Add Level",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Новый уровень\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/data/level",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"data",
+						"level"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "6.  Delete Level",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/data/level?id=4",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"data",
+						"level"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "4"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "7.  Update Level",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": 4,\n    \"name\": \"New LEVEL\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/data/level",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"data",
+						"level"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "8. Add CI",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"CI00011\",\n    \"name\": \"Test CI Name1\",\n    \"type\": \"Server\",\n    \"level\": 3,\n    \"properties\": {\n        \"Owner\": \"John Doe\",\n        \"Priority\": \"High\"\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/data/ci",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"data",
+						"ci"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "9. Add multiple CIs",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[\n    {\n      \"id\": \"BL0001\",\n      \"name\": \"Customer Management System\",\n      \"type\": \"Business Layer\",\n      \"level\": 0,\n      \"properties\": {\n        \"BusinessOwner\": \"John Doe\",\n        \"Priority\": \"High\"\n      }\n    },\n    {\n      \"id\": \"BL0002\",\n      \"name\": \"Order Processing Workflow\",\n      \"type\": \"Business Layer\",\n      \"level\": 0,\n      \"properties\": {\n        \"ProcessOwner\": \"Jane Smith\",\n        \"Criticality\": \"High\"\n      }\n    },\n    {\n      \"id\": \"AL0001\",\n      \"name\": \"Web Application Frontend\",\n      \"type\": \"Application Layer\",\n      \"level\": 1,\n      \"properties\": {\n        \"Technology\": \"React\",\n        \"Version\": \"2.1.0\"\n      }\n    },\n    {\n      \"id\": \"AL0002\",\n      \"name\": \"Backend API Service\",\n      \"type\": \"Application Layer\",\n      \"level\": 1,\n      \"properties\": {\n        \"Technology\": \"Node.js\",\n        \"Framework\": \"Express\"\n      }\n    },\n    {\n      \"id\": \"LL0001\",\n      \"name\": \"Database Server Cluster\",\n      \"type\": \"Logical Layer\",\n      \"level\": 2,\n      \"properties\": {\n        \"Technology\": \"PostgreSQL\",\n        \"Replication\": \"Active-Passive\"\n      }\n    },\n    {\n      \"id\": \"LL0002\",\n      \"name\": \"Caching Layer\",\n      \"type\": \"Logical Layer\",\n      \"level\": 2,\n      \"properties\": {\n        \"Technology\": \"Redis\",\n        \"Size\": \"128GB\"\n      }\n    },\n    {\n      \"id\": \"SRV0001\",\n      \"name\": \"alpha-web-01\",\n      \"type\": \"Server\",\n      \"level\": 3,\n      \"properties\": {\n        \"OS\": \"Linux CentOS 7\",\n        \"CPU\": \"Intel Xeon E5-2699 v4\",\n        \"RAM\": \"64GB\",\n        \"Storage\": \"2x1TB SSD RAID1\",\n        \"IP\": \"192.168.1.10\",\n        \"Location\": \"Rack A1-05\"\n      }\n    },\n    {\n      \"id\": \"SRV0002\",\n      \"name\": \"beta-db-02\",\n      \"type\": \"Server\",\n      \"level\": 3,\n      \"properties\": {\n        \"OS\": \"Windows Server 2019\",\n        \"CPU\": \"AMD EPYC 7742\",\n        \"RAM\": \"256GB\",\n        \"Storage\": \"4x2TB NVMe RAID5\",\n        \"IP\": \"192.168.1.20\",\n        \"Database\": \"PostgreSQL 13\"\n      }\n    },\n    {\n      \"id\": \"SRV0003\",\n      \"name\": \"gamma-app-03\",\n      \"type\": \"Server\",\n      \"level\": 3,\n      \"properties\": {\n        \"OS\": \"Ubuntu Server 20.04\",\n        \"CPU\": \"Intel Core i9-10900K\",\n        \"RAM\": \"32GB\",\n        \"Storage\": \"1x500GB SSD\",\n        \"IP\": \"192.168.1.30\",\n        \"Application\": \"Node.js v16\"\n      }\n    },\n    {\n      \"id\": \"SRV0004\",\n      \"name\": \"delta-mail-01\",\n      \"type\": \"Server\",\n      \"level\": 3,\n      \"properties\": {\n        \"OS\": \"Linux Debian 10\",\n        \"CPU\": \"Intel Xeon E3-1270 v6\",\n        \"RAM\": \"16GB\",\n        \"Storage\": \"2x500GB HDD RAID1\",\n        \"IP\": \"192.168.1.40\",\n        \"Service\": \"Postfix, Dovecot\"\n      }\n    },\n    {\n      \"id\": \"SRV0005\",\n      \"name\": \"epsilon-cache-02\",\n      \"type\": \"Server\",\n      \"level\": 3,\n      \"properties\": {\n        \"OS\": \"Linux Alpine 3.14\",\n        \"CPU\": \"AMD Ryzen 5 5600X\",\n        \"RAM\": \"128GB\",\n        \"Storage\": \"1x1TB NVMe\",\n        \"IP\": \"192.168.1.50\",\n        \"Cache\": \"Redis 6\"\n      }\n    },\n    {\n      \"id\": \"SRV0006\",\n      \"name\": \"zeta-build-01\",\n      \"type\": \"Server\",\n      \"level\": 3,\n      \"properties\": {\n        \"OS\": \"Windows Server 2022\",\n        \"CPU\": \"Intel Xeon Gold 6338\",\n        \"RAM\": \"64GB\",\n        \"Storage\": \"1x2TB SSD\",\n        \"IP\": \"192.168.1.60\",\n        \"Tool\": \"Jenkins, Maven\"\n      }\n    },\n    {\n      \"id\": \"SRV0007\",\n      \"name\": \"eta-monitoring-01\",\n      \"type\": \"Server\",\n      \"level\": 3,\n      \"properties\": {\n        \"OS\": \"Ubuntu Server 22.04\",\n        \"CPU\": \"AMD EPYC 7543P\",\n        \"RAM\": \"32GB\",\n        \"Storage\": \"2x1TB SSD RAID0\",\n        \"IP\": \"192.168.1.70\",\n        \"Software\": \"Prometheus, Grafana\"\n      }\n    },\n    {\n      \"id\": \"SRV0008\",\n      \"name\": \"theta-backup-01\",\n      \"type\": \"Server\",\n      \"level\": 3,\n      \"properties\": {\n        \"OS\": \"Linux CentOS Stream 9\",\n        \"CPU\": \"Intel Core i7-11700K\",\n        \"RAM\": \"16GB\",\n        \"Storage\": \"6x4TB HDD RAID6\",\n        \"IP\": \"192.168.1.80\",\n        \"Application\": \"Veeam Backup & Replication\"\n      }\n    },\n    {\n      \"id\": \"SRV0009\",\n      \"name\": \"iota-proxy-01\",\n      \"type\": \"Server\",\n      \"level\": 3,\n      \"properties\": {\n        \"OS\": \"Linux Fedora 37\",\n        \"CPU\": \"AMD Ryzen 7 5800X\",\n        \"RAM\": \"8GB\",\n        \"Storage\": \"1x250GB SSD\",\n        \"IP\": \"192.168.1.90\",\n        \"Software\": \"Nginx\"\n      }\n    },\n    {\n      \"id\": \"SRV0010\",\n      \"name\": \"kappa-dns-01\",\n      \"type\": \"Server\",\n      \"level\": 3,\n      \"properties\": {\n        \"OS\": \"Linux Debian 11\",\n        \"CPU\": \"Intel Xeon E3-1505M v5\",\n        \"RAM\": \"4GB\",\n        \"Storage\": \"1x120GB SSD\",\n        \"IP\": \"192.168.1.100\",\n        \"Service\": \"BIND9\"\n      }\n    },\n    {\n      \"id\": \"SRV0011\",\n      \"name\": \"lambda-auth-01\",\n      \"type\": \"Server\",\n      \"level\": 3,\n      \"properties\": {\n        \"OS\": \"Ubuntu Server 20.04\",\n        \"CPU\": \"AMD EPYC 7302P\",\n        \"RAM\": \"32GB\",\n        \"Storage\": \"2x500GB SSD RAID1\",\n        \"IP\": \"192.168.1.110\",\n        \"Software\": \"Keycloak\"\n      }\n    },\n    {\n      \"id\": \"SRV0012\",\n      \"name\": \"mu-log-01\",\n      \"type\": \"Server\",\n      \"level\": 3,\n      \"properties\": {\n        \"OS\": \"Linux CentOS 7\",\n        \"CPU\": \"Intel Xeon E5-2650 v4\",\n        \"RAM\": \"64GB\",\n        \"Storage\": \"4x3TB HDD RAID5\",\n        \"IP\": \"192.168.1.120\",\n        \"Software\": \"Elasticsearch, Kibana\"\n      }\n    },\n    {\n      \"id\": \"SRV0013\",\n      \"name\": \"nu-test-01\",\n      \"type\": \"Server\",\n      \"level\": 3,\n      \"properties\": {\n        \"OS\": \"Windows Server 2019\",\n        \"CPU\": \"AMD Ryzen Threadripper 3960X\",\n        \"RAM\": \"128GB\",\n        \"Storage\": \"1x1TB NVMe\",\n        \"IP\": \"192.168.1.130\",\n        \"Environment\": \"Development\"\n      }\n    },\n    {\n      \"id\": \"SRV0014\",\n      \"name\": \"xi-stage-01\",\n      \"type\": \"Server\",\n      \"level\": 3,\n      \"properties\": {\n        \"OS\": \"Ubuntu Server 22.04\",\n        \"CPU\": \"Intel Core i7-12700K\",\n        \"RAM\": \"32GB\",\n        \"Storage\": \"2x500GB SSD RAID0\",\n        \"IP\": \"192.168.1.140\",\n        \"Environment\": \"Staging\"\n      }\n    },\n    {\n      \"id\": \"SRV0015\",\n      \"name\": \"omicron-prod-db-01\",\n      \"type\": \"Server\",\n      \"level\": 3,\n      \"properties\": {\n        \"OS\": \"Linux Oracle Linux 8\",\n        \"CPU\": \"Intel Xeon Platinum 8380\",\n        \"RAM\": \"512GB\",\n        \"Storage\": \"8x2TB NVMe RAID10\",\n        \"IP\": \"192.168.1.150\",\n        \"Database\": \"Oracle 19c\"\n      }\n    },\n    {\n      \"id\": \"SRV0016\",\n      \"name\": \"pi-analytics-01\",\n      \"type\": \"Server\",\n      \"level\": 3,\n      \"properties\": {\n        \"OS\": \"Ubuntu Server 20.04\",\n        \"CPU\": \"AMD EPYC 7763\",\n        \"RAM\": \"256GB\",\n        \"Storage\": \"4x1TB SSD RAID5\",\n        \"IP\": \"192.168.1.160\",\n        \"Software\": \"Apache Spark, Hadoop\"\n      }\n    },\n    {\n      \"id\": \"SRV0017\",\n      \"name\": \"rho-frontend-01\",\n      \"type\": \"Server\",\n      \"level\": 3,\n      \"properties\": {\n        \"OS\": \"Linux CentOS 7\",\n        \"CPU\": \"Intel Xeon E3-1280 v5\",\n        \"RAM\": \"16GB\",\n        \"Storage\": \"1x250GB SSD\",\n        \"IP\": \"192.168.1.170\",\n        \"Software\": \"Apache HTTP Server\"\n      }\n    },\n    {\n      \"id\": \"SRV0018\",\n      \"name\": \"sigma-storage-01\",\n      \"type\": \"Server\",\n      \"level\": 3,\n      \"properties\": {\n        \"OS\": \"Linux Ubuntu 22.04\",\n        \"CPU\": \"AMD Ryzen 9 5950X\",\n        \"RAM\": \"64GB\",\n        \"Storage\": \"12x8TB HDD RAID6\",\n        \"IP\": \"192.168.1.180\",\n        \"Service\": \"NFS, SMB\"\n      }\n    },\n    {\n      \"id\": \"SRV0019\",\n      \"name\": \"tau-vpn-01\",\n      \"type\": \"Server\",\n      \"level\": 3,\n      \"properties\": {\n        \"OS\": \"Linux Alpine 3.14\",\n        \"CPU\": \"Intel Atom C3758\",\n        \"RAM\": \"8GB\",\n        \"Storage\": \"1x120GB SSD\",\n        \"IP\": \"192.168.1.190\",\n        \"Software\": \"OpenVPN\"\n      }\n    },\n    {\n      \"id\": \"SRV0020\",\n      \"name\": \"upsilon-gateway-01\",\n      \"type\": \"Server\",\n      \"level\": 3,\n      \"properties\": {\n        \"OS\": \"Linux Fedora 37\",\n        \"CPU\": \"AMD Ryzen 5 PRO 4650G\",\n        \"RAM\": \"16GB\",\n        \"Storage\": \"1x500GB SSD\",\n        \"IP\": \"192.168.1.200\",\n        \"Software\": \"HAProxy\"\n      }\n    }\n  ]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/data/ci",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"data",
+						"ci"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "10. Get all CIs",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/data/ci",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"data",
+						"ci"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "11. Get CIs",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/data/ci?type=Server&level=3",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"data",
+						"ci"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "Server"
+						},
+						{
+							"key": "level",
+							"value": "3"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "12. Get CIs by props",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/data/ci?type=Server&level=3&has_props=OS,CPU,test",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"data",
+						"ci"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "Server"
+						},
+						{
+							"key": "level",
+							"value": "3"
+						},
+						{
+							"key": "has_props",
+							"value": "OS,CPU,test"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "13. Get CI by ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/data/ci?id=SRV0001",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"data",
+						"ci"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "SRV0001"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "14.  Delete CI",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/data/ci?id=CI0001",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"data",
+						"ci"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "CI0001"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "15.  Update CI",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\"id\": \"SRV0001\",\n\"name\": \"alpha-web-test\",\n\"level\": 3,\n\"properties\": {\n    \"OS\": \"Linux CentOS 7\",\n    \"IP\": \"192.168.1.11\",\n    \"Location\": \"Rack A1-05\",\n    \"RAM\": \"64GB\",\n    \"test\": null\n    }\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/data/ci",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"data",
+						"ci"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "16.  Update multiple CIs",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[\n    {\n    \"id\": \"SRV0001\",\n    \"name\": \"alpha-web-01\",\n    \"level\": 3,\n    \"properties\": {\n      \"OS\": \"Linux\",\n      \"CPU\": \"Intel Xeon E5-2699 v4\",\n      \"RAM\": \"64GB\",\n      \"Storage\": \"2x1TB SSD RAID1\",\n      \"IP\": \"192.168.1.10\",\n      \"Location\": null\n    }\n  }\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/data/ci",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"data",
+						"ci"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "17. Get properties",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/data/props",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"data",
+						"props"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "18. Get Relationships",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/data/relationship",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"data",
+						"relationship"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "19. Add Relationship",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"source\": \"SRV0001\",\n    \"destination\": \"SRV0002\",\n    \"type\": \"Depends\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/data/relationship",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"data",
+						"relationship"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "20. Add multiple Relationships",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[\n    {\n      \"source\": \"BL0001\",\n      \"destination\": \"AL0001\",\n      \"type\": \"Uses\"\n    },\n    {\n      \"source\": \"BL0001\",\n      \"destination\": \"AL0002\",\n      \"type\": \"Uses\"\n    },\n    {\n      \"source\": \"BL0002\",\n      \"destination\": \"AL0002\",\n      \"type\": \"Uses\"\n    },\n    {\n      \"source\": \"AL0001\",\n      \"destination\": \"SRV0017\",\n      \"type\": \"RunsOn\"\n    },\n    {\n      \"source\": \"AL0002\",\n      \"destination\": \"SRV0003\",\n      \"type\": \"RunsOn\"\n    },\n    {\n      \"source\": \"AL0002\",\n      \"destination\": \"LL0001\",\n      \"type\": \"DependsOn\"\n    },\n    {\n      \"source\": \"LL0001\",\n      \"destination\": \"SRV0002\",\n      \"type\": \"HostedOn\"\n    },\n    {\n      \"source\": \"LL0001\",\n      \"destination\": \"SRV0015\",\n      \"type\": \"HostedOn\"\n    },\n    {\n      \"source\": \"AL0002\",\n      \"destination\": \"LL0002\",\n      \"type\": \"DependsOn\"\n    },\n    {\n      \"source\": \"LL0002\",\n      \"destination\": \"SRV0005\",\n      \"type\": \"HostedOn\"\n    },\n    {\n      \"source\": \"SRV0001\",\n      \"destination\": \"SRV0010\",\n      \"type\": \"DependsOn\",\n      \"description\": \"Relies on DNS server for name resolution\"\n    },\n    {\n      \"source\": \"SRV0002\",\n      \"destination\": \"SRV0018\",\n      \"type\": \"Uses\",\n      \"description\": \"Stores data on shared storage\"\n    },\n    {\n      \"source\": \"SRV0003\",\n      \"destination\": \"SRV0011\",\n      \"type\": \"AuthenticatesAgainst\"\n    },\n    {\n      \"source\": \"SRV0004\",\n      \"destination\": \"SRV0010\",\n      \"type\": \"DependsOn\",\n      \"description\": \"Mail server needs DNS\"\n    },\n    {\n      \"source\": \"SRV0005\",\n      \"destination\": \"SRV0007\",\n      \"type\": \"MonitoredBy\"\n    },\n    {\n      \"source\": \"SRV0006\",\n      \"destination\": \"SRV0013\",\n      \"type\": \"DeploysTo\"\n    },\n    {\n      \"source\": \"SRV0007\",\n      \"destination\": \"SRV0012\",\n      \"type\": \"SendsLogsTo\"\n    },\n    {\n      \"source\": \"SRV0008\",\n      \"destination\": \"SRV0018\",\n      \"type\": \"Uses\",\n      \"description\": \"Backup data stored on shared storage\"\n    }\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/data/relationship",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"data",
+						"relationship"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "21. Delete Relationship",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/data/relationship?source=SRV0001&destination=SRV0002",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"data",
+						"relationship"
+					],
+					"query": [
+						{
+							"key": "source",
+							"value": "SRV0001"
+						},
+						{
+							"key": "destination",
+							"value": "SRV0002"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

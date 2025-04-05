@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cmdb-server-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cmdb-server
+  template:
+    metadata:
+      labels:
+        app: cmdb-server
+    spec:
+      containers:
+        - name: cmdb-server-container
+          image: your-dockerhub-username/cmdb-server:latest # Замените на ваш образ в Docker Hub
+          ports:
+            - containerPort: 8080
+          env:
+            - name: CMDB_DB_PATH
+              value: /data/cmdb.bin # Путь к файлу БД внутри контейнера
+          volumeMounts:
+            - name: cmdb-data
+              mountPath: /data # Укажите желаемое количество реплик
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cmdb-server-service
+spec:
+  selector:
+    app: cmdb-server
+  ports:
+    - protocol: TCP
+      port: 80 # Порт, на котором будет доступен сервис внутри кластера
+      targetPort: 8080 # Порт контейнера
+  type: LoadBalancer # Или ClusterIP, NodePort в зависимости от ваших потребностей
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cmdb-data-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce # Или ReadWriteMany, в зависимости от требований
+  resources:
+    requests:
+      storage: 1Gi # Запросите необходимое пространство
