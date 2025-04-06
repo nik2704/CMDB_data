@@ -53,10 +53,20 @@ if(WITH_BOOST_TEST)
         tests/CMDB/test_ci.cpp
         CMDB/CI.cpp
     )
-    
+
+    add_executable(test_relationship
+        tests/CMDB/test_relationship.cpp
+        CMDB/Relationship.cpp
+    )
+
 
     # Линкуем Boost с исполняемым файлом
     target_link_libraries(test_ci
+        Boost::unit_test_framework
+        Boost::json
+    )
+
+    target_link_libraries(test_relationship
         Boost::unit_test_framework
         Boost::json
     )
@@ -67,11 +77,20 @@ if(WITH_BOOST_TEST)
         CXX_STANDARD_REQUIRED ON
     )
 
+    set_target_properties(test_relationship PROPERTIES
+        CXX_STANDARD 17
+        CXX_STANDARD_REQUIRED ON
+    )
+
     target_include_directories(test_ci PRIVATE ${Boost_INCLUDE_DIRS})
+
+    target_include_directories(test_relationship PRIVATE ${Boost_INCLUDE_DIRS})
 
     # Регистрация теста в CTest
     enable_testing()
     add_test(NAME test_ci COMMAND test_ci)
+    add_test(NAME test_relationship COMMAND test_relationship)
+
 endif()
 
 
