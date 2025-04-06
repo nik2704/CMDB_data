@@ -9,11 +9,13 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # Опции для статической линковки (если нужно)
-set(Boost_USE_STATIC_LIBS OFF)
+set(Boost_USE_STATIC_LIBS ON)
+set(Boost_USE_STATIC_RUNTIME OFF)
 # set(Boost_USE_STATIC_RUNTIME ON)  # Используйте только если хотите статический рантайм
 
 # Поиск Boost
-find_package(Boost 1.67 REQUIRED COMPONENTS system thread json program_options)
+find_package(Boost 1.67 REQUIRED COMPONENTS system thread json program_options unit_test_framework)
+#find_package(Boost 1.67 REQUIRED COMPONENTS system thread json program_options)
 
 # Добавляем исполняемый файл
 add_executable(cmdb_service 
