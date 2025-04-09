@@ -25,8 +25,8 @@ public:
     
     void Run();
 private:
-    void AcceptConnections();
-    void Session(std::shared_ptr<tcp::socket> socket);
+    void acceptConnections();
+    void session(std::shared_ptr<tcp::socket> socket);
     std::string db_;
     net::io_context ioc_;
     tcp::acceptor acceptor_;

@@ -2,7 +2,7 @@
 
 DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
 
-    json::object DataStore::GetAllRecords() {
+    json::object DataStore::getAllRecords() {
         json::object result;
 
         if (auto levels = cmdb_.getLevels()) {
@@ -44,7 +44,7 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
         return result;
     }
 
-    json::array DataStore::GetAllLevels() {
+    json::array DataStore::getAllLevels() {
         json::array levelsArray;
 
         if (auto levels = cmdb_.getLevels()) {
@@ -56,7 +56,7 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
         return levelsArray;
     }
 
-    json::object DataStore::GetLevel(int id) {
+    json::object DataStore::getLevel(int id) {
         json::object result;
 
         auto levelName = cmdb_.getLevelName(id);
@@ -66,7 +66,7 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
         return result;
     }
 
-    json::array DataStore::GetCi(const std::map<std::string, std::string>& filters) {
+    json::array DataStore::getCi(const std::map<std::string, std::string>& filters) {
         std::shared_ptr<std::vector<cmdb::CMDB::CIPtr>> cis = cmdb_.getCIs(filters);
 
         json::array result;
@@ -79,7 +79,7 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
         return result;
     }
 
-    json::array DataStore::GetRelationships(const std::map<std::string, std::string>& filters) {
+    json::array DataStore::getRelationships(const std::map<std::string, std::string>& filters) {
         std::shared_ptr<std::vector<cmdb::CMDB::RelationshipPtr>> rels = cmdb_.getRelationships(filters);
 
         json::array result;
@@ -93,7 +93,7 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
         return result;
     }
 
-    json::object DataStore::AddLevel(const json::object& level) {
+    json::object DataStore::addLevel(const json::object& level) {
         json::object result;
 
         if (!level.contains("name")) {
@@ -110,7 +110,7 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
         return result;
     }
 
-    bool DataStore::AddCiToCMDB(const json::object& ci, std::string& message, std::string& ciId) {
+    bool DataStore::addCiToCMDB(const json::object& ci, std::string& message, std::string& ciId) {
         if (!ci.contains("id") || !ci.contains("name") || !ci.contains("type") || !ci.contains("level")) {
             message = "Не запонены обязательные поля.";
             return false;
@@ -155,7 +155,7 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
         return true;
     }
 
-    boost::json::object DataStore::AddCi(const boost::json::object& ci) {
+    boost::json::object DataStore::addCi(const boost::json::object& ci) {
         boost::json::object result = ci;
         result["status"] = "success";
         result["id"] = "unknown";
@@ -163,7 +163,7 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
         std::string message;
         std::string id;
 
-        if (!AddCiToCMDB(ci, message, id)) {
+        if (!addCiToCMDB(ci, message, id)) {
             result["status"] = "failure";
         }
 
@@ -173,7 +173,7 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
         return result;
     }
 
-    boost::json::object DataStore::AddCis(const boost::json::array& cis) {
+    boost::json::object DataStore::addCis(const boost::json::array& cis) {
         boost::json::object result;
         boost::json::array cis_add;
         int addedCount = 0;
@@ -193,7 +193,7 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
             std::string message;
             std::string ciId = "unknown";
 
-            if (AddCiToCMDB(ci, message, ciId)) {
+            if (addCiToCMDB(ci, message, ciId)) {
                 ++addedCount;
             }
 
@@ -215,7 +215,7 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
         return result;
     }
 
-    bool DataStore::AddRelationshipToCMDB(const json::object& ci, std::string& message) {
+    bool DataStore::addRelationshipToCMDB(const json::object& ci, std::string& message) {
         if (!ci.contains("source") || !ci.contains("destination") || !ci.contains("type")) {
             message = "Не запонены обязательные поля.";
             return false;
@@ -234,7 +234,7 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
         return true;
     }
 
-    boost::json::object DataStore::AddRelationship(const boost::json::object& relationship) {
+    boost::json::object DataStore::addRelationship(const boost::json::object& relationship) {
         boost::json::object result;
 
         result["relationship"] = relationship;
@@ -244,7 +244,7 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
         std::string from;
         std::string to;
 
-        if (!AddRelationshipToCMDB(relationship, message)) {
+        if (!addRelationshipToCMDB(relationship, message)) {
             result["status"] = "failure";
         }
 
@@ -253,7 +253,7 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
         return result;
     }
 
-    boost::json::object DataStore::AddRelationships(const json::array& relationships) {
+    boost::json::object DataStore::addRelationships(const json::array& relationships) {
         boost::json::object result;
         boost::json::array rel_add;
         int addedCount = 0;
@@ -272,7 +272,7 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
             const boost::json::object& rel = relationshipValue.as_object();
             std::string message;
 
-            if (AddRelationshipToCMDB(rel, message)) {
+            if (addRelationshipToCMDB(rel, message)) {
                 ++addedCount;
             }
 
@@ -294,7 +294,7 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
         return result;
     }
 
-    json::object DataStore::DeleteLevel(int id) {
+    json::object DataStore::deleteLevel(int id) {
         json::object result;
 
         result["status"] = "success";
@@ -308,7 +308,7 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
         return result;
     }
 
-    json::object DataStore::DeleteCi(const std::string& id) {
+    json::object DataStore::deleteCi(const std::string& id) {
         json::object result;
 
         result["status"] = "success";
@@ -322,7 +322,7 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
         return result;
     }
 
-    boost::json::object DataStore::DeleteRelationships(const std::map<std::string, std::string>& filters) {
+    boost::json::object DataStore::deleteRelationships(const std::map<std::string, std::string>& filters) {
         json::object result;
 
         result["status"] = "success";
@@ -355,7 +355,7 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
         return result;
     }
 
-    bool DataStore::UpdateCiInCMDB(const json::object& ci, std::string& message, std::string& ciId) {
+    bool DataStore::updateCiInCMDB(const json::object& ci, std::string& message, std::string& ciId) {
         if (!ci.contains("id")) {
             message = "Не запонен ID.";
             return false;
@@ -373,7 +373,7 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
         return cmdb_.updateCI(current_ci, ci, message);
     }
 
-    json::object DataStore::UpdateCi(const json::object& ci) {
+    json::object DataStore::updateCi(const json::object& ci) {
         boost::json::object result;
         result["ci"] = ci;
         result["status"] = "success";
@@ -382,7 +382,7 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
         std::string message;
         std::string id;
 
-        if (!UpdateCiInCMDB(ci, message, id)) {
+        if (!updateCiInCMDB(ci, message, id)) {
             result["status"] = "failure";
         }
 
@@ -392,7 +392,7 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
         return result;
     }
 
-    json::object DataStore::UpdateCis(const json::array& cis) {
+    json::object DataStore::updateCis(const json::array& cis) {
         boost::json::object result;
         boost::json::array cis_add;
         int updatedCount = 0;
@@ -412,7 +412,7 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
             std::string message;
             std::string ciId = "unknown";
 
-            if (UpdateCiInCMDB(ci, message, ciId)) {
+            if (updateCiInCMDB(ci, message, ciId)) {
                 ++updatedCount;
             }
 
@@ -434,7 +434,7 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
         return result;
     }
 
-    json::object DataStore::UpdateLevel(const json::object& level) {
+    json::object DataStore::updateLevel(const json::object& level) {
         json::object result;
         result["status"] = "failure";
 
@@ -459,7 +459,7 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
         return result;
     }
 
-    json::object DataStore::GetPropsList() {
+    json::object DataStore::getPropsList() {
         json::object result;
         
         result["properties"] = cmdb_.getProps();
@@ -467,37 +467,6 @@ DataStore::DataStore(cmdb::CMDB& cmdb) : cmdb_(cmdb) {}
         return result;
     }
 
-    int DataStore::AddRecord(const json::object& record) {
-        // Заглушка: возвращает 0
-        return 0;
-    }
-
-    bool DataStore::UpdateRecord(int id, const json::object& record) {
-        // Заглушка: возвращает false
-        return false;
-    }
-
     bool DataStore::isCIexists(std::string id) {
         return cmdb_.getCI(id) != nullptr ? true : false;
     }
-// int DataStore::AddRecord(const json::object& record) {
-//     int new_id = data_.size() + 1;
-//     for (auto& [key, value] : record) {
-//         data_[new_id][key] = value.as_string();
-//     }
-//     return new_id;
-// }
-
-// bool DataStore::UpdateRecord(int id, const json::object& record) {
-//     if (data_.find(id) == data_.end()) return false;
-//     for (auto& [key, value] : record) {
-//         data_[id][key] = value.as_sci.contains("id")
-//     for (const auto& [id, record] : data_) {
-//         json::object record_json;
-//         for (const auto& [key, value] : record) {
-//             record_json[key] = value;
-//         }
-//         result[std::to_string(id)] = record_json;
-//     }
-//     return result;
-// }

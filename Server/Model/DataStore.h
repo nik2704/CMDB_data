@@ -13,55 +13,47 @@ class DataStore {
 public:
     DataStore(cmdb::CMDB& cmdb);
 
-    // int AddRecord(const json::object& record);
-    // bool UpdateRecord(int id, const json::object& record);
-    // json::object GetAllRecords() const;
+    json::object getAllRecords();
 
-    json::object GetAllRecords();
+    json::array getAllLevels();
 
-    json::array GetAllLevels();
+    json::object getLevel(int id);
 
-    json::object GetLevel(int id);
+    json::array getCi(const std::map<std::string, std::string>& filters);
 
-    json::array GetCi(const std::map<std::string, std::string>& filters);
+    json::array getRelationships(const std::map<std::string, std::string>& filters);
 
-    json::array GetRelationships(const std::map<std::string, std::string>& filters);
+    json::object addLevel(const json::object& level);
 
-    json::object AddLevel(const json::object& level);
+    boost::json::object addCi(const json::object& ci);
 
-    boost::json::object AddCi(const json::object& ci);
+    boost::json::object addCis(const json::array& cis);
 
-    boost::json::object AddCis(const json::array& cis);
+    bool addRelationshipToCMDB(const json::object& ci, std::string& message);
 
-    bool AddRelationshipToCMDB(const json::object& ci, std::string& message);
-
-    boost::json::object AddRelationship(const boost::json::object& relationships);
+    boost::json::object addRelationship(const boost::json::object& relationships);
     
-    boost::json::object AddRelationships(const json::array& relationships);
+    boost::json::object addRelationships(const json::array& relationships);
 
-    json::object DeleteLevel(int id);
+    json::object deleteLevel(int id);
 
-    json::object DeleteCi(const std::string& id);
+    json::object deleteCi(const std::string& id);
 
-    boost::json::object DeleteRelationships(const std::map<std::string, std::string>& filters);
+    boost::json::object deleteRelationships(const std::map<std::string, std::string>& filters);
 
-    json::object UpdateCi(const json::object& ci);
+    json::object updateCi(const json::object& ci);
 
-    json::object UpdateCis(const json::array& cis);
+    json::object updateCis(const json::array& cis);
 
-    json::object UpdateLevel(const json::object& level);
+    json::object updateLevel(const json::object& level);
 
-    json::object GetPropsList();
-
-    int AddRecord(const json::object& record);
-
-    bool UpdateRecord(int id, const json::object& record);
+    json::object getPropsList();
 
 private:
     std::unordered_map<int, std::unordered_map<std::string, std::string>> data_;
     cmdb::CMDB& cmdb_;
 
-    bool AddCiToCMDB(const json::object& ci, std::string& message, std::string& ciId);
-    bool UpdateCiInCMDB(const json::object& ci, std::string& message, std::string& ciId);
+    bool addCiToCMDB(const json::object& ci, std::string& message, std::string& ciId);
+    bool updateCiInCMDB(const json::object& ci, std::string& message, std::string& ciId);
     bool isCIexists(std::string id);
 };

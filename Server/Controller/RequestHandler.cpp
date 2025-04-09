@@ -1,7 +1,7 @@
 #include "RequestHandler.h"
 #include "../View/ResponseFormatter.h"
 
-void RequestHandler::HandleRequest(http::request<http::string_body>& req, http::response<http::string_body>& res) {
+void RequestHandler::handleRequest(http::request<http::string_body>& req, http::response<http::string_body>& res) {
     std::string_view target = req.target();
     std::string_view api_path = "/api/v1/data";
 
@@ -15,260 +15,260 @@ void RequestHandler::HandleRequest(http::request<http::string_body>& req, http::
 
         if (sub_target == "/all") {
             if (req.method() == http::verb::get) {
-                HandleGetAll(res);
+                handleGetAll(res);
             } else {
-                ResponseFormatter::MakeErrorResponse(res, http::status::method_not_allowed, "Метод не разрешен");
+                ResponseFormatter::makeErrorResponse(res, http::status::method_not_allowed, "Метод не разрешен");
             }
         } else if (sub_target == "/level") {
             if (req.method() == http::verb::get) {
-                HandleGetLevel(req, res);
+                handleGetLevel(req, res);
             } else if (req.method() == http::verb::post) {
-                HandleAddLevel(req, res);
+                handleAddLevel(req, res);
             } else if (req.method() == http::verb::delete_) {
-                HandleDeleteLevel(req, res);
+                handleDeleteLevel(req, res);
             } else if (req.method() == http::verb::patch) {
-                HandleUpdateLevel(req, res);
+                handleUpdateLevel(req, res);
             } else {
-                ResponseFormatter::MakeErrorResponse(res, http::status::method_not_allowed, "Метод не разрешен");
+                ResponseFormatter::makeErrorResponse(res, http::status::method_not_allowed, "Метод не разрешен");
             }
         } else if (sub_target == "/ci") {
             if (req.method() == http::verb::get) {
-                HandleGetCi(req, res);
+                handleGetCi(req, res);
             } else if (req.method() == http::verb::post) {
-                HandleAddCi(req, res);
+                handleAddCi(req, res);
             } else if (req.method() == http::verb::delete_) {
-                HandleDeleteCi(req, res);
+                handleDeleteCi(req, res);
             } else if (req.method() == http::verb::patch) {
-                HandleUpdateCi(req, res);
+                handleUpdateCi(req, res);
             } else {
-                ResponseFormatter::MakeErrorResponse(res, http::status::method_not_allowed, "Метод не разрешен");
+                ResponseFormatter::makeErrorResponse(res, http::status::method_not_allowed, "Метод не разрешен");
             }
         } else if (sub_target == "/props") {
             if (req.method() == http::verb::get) {
-                HandleGetProps(req, res);
+                handleGetProps(req, res);
             } else {
-                ResponseFormatter::MakeErrorResponse(res, http::status::method_not_allowed, "Метод не разрешен");
+                ResponseFormatter::makeErrorResponse(res, http::status::method_not_allowed, "Метод не разрешен");
             }
         } else if (sub_target == "/relationship") {
             if (req.method() == http::verb::get) {
-                HandleGetRelationships(req, res);
+                handleGetRelationships(req, res);
             } else if (req.method() == http::verb::post) {
-                HandleAddRelationships(req, res);
+                handleAddRelationships(req, res);
             } else if (req.method() == http::verb::delete_) {
-                HandleDeleteRelationships(req, res);
+                handleDeleteRelationships(req, res);
             } else {
-                ResponseFormatter::MakeErrorResponse(res, http::status::method_not_allowed, "Метод не разрешен");
+                ResponseFormatter::makeErrorResponse(res, http::status::method_not_allowed, "Метод не разрешен");
             }
         } else {
-            ResponseFormatter::MakeErrorResponse(res, http::status::not_found, "Not found");
+            ResponseFormatter::makeErrorResponse(res, http::status::not_found, "Not found");
         }
     } else {
-        ResponseFormatter::MakeErrorResponse(res, http::status::no_content, "Hello, from the Server!");
+        ResponseFormatter::makeErrorResponse(res, http::status::no_content, "Hello, from the Server!");
     }
 }
 
-void RequestHandler::HandleGetAll(http::response<http::string_body>& res) {
-    json::object records = store_.GetAllRecords();
-    ResponseFormatter::MakeJSONResponse(res, records);
+void RequestHandler::handleGetAll(http::response<http::string_body>& res) {
+    json::object records = store_.getAllRecords();
+    ResponseFormatter::makeJSONResponse(res, records);
 }
 
-void RequestHandler::HandleGetLevel(http::request<http::string_body>& req, http::response<http::string_body>& res) {
+void RequestHandler::handleGetLevel(http::request<http::string_body>& req, http::response<http::string_body>& res) {
     std::map<std::string, std::string> query_params = getQueryParams(req);
 
     if (query_params.count("id")) {
         try {
             int id = std::stoi(query_params["id"]);
-            json::object level = store_.GetLevel(id);
+            json::object level = store_.getLevel(id);
             
             if(level.empty()) {
-                ResponseFormatter::MakeErrorResponse(res, http::status::not_found, "Level не найден");
+                ResponseFormatter::makeErrorResponse(res, http::status::not_found, "Level не найден");
             } else {
-                ResponseFormatter::MakeJSONResponse(res, level);
+                ResponseFormatter::makeJSONResponse(res, level);
             }
         } catch (...) {
-            ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "Не корректный id");
+            ResponseFormatter::makeErrorResponse(res, http::status::bad_request, "Не корректный id");
         }
     } else {
-        json::array levels = store_.GetAllLevels();
-        ResponseFormatter::MakeJSONResponse(res, levels);
+        json::array levels = store_.getAllLevels();
+        ResponseFormatter::makeJSONResponse(res, levels);
     }
 }
 
-void RequestHandler::HandleGetCi(http::request<http::string_body>& req, http::response<http::string_body>& res) {
+void RequestHandler::handleGetCi(http::request<http::string_body>& req, http::response<http::string_body>& res) {
     std::map<std::string, std::string> query_params = getQueryParams(req);
-    json::array cis = store_.GetCi(query_params);
+    json::array cis = store_.getCi(query_params);
 
     if (!cis.empty()) {
-        ResponseFormatter::MakeJSONResponse(res, cis);
+        ResponseFormatter::makeJSONResponse(res, cis);
     } else {
-        ResponseFormatter::MakeErrorResponse(res, http::status::not_found, "Не найдено");
+        ResponseFormatter::makeErrorResponse(res, http::status::not_found, "Не найдено");
     }
 }
 
-void RequestHandler::HandleGetRelationships(http::request<http::string_body>& req, http::response<http::string_body>& res) {
+void RequestHandler::handleGetRelationships(http::request<http::string_body>& req, http::response<http::string_body>& res) {
     std::map<std::string, std::string> query_params =getQueryParams(req);
 
-    json::array relationships = store_.GetRelationships(query_params);
+    json::array relationships = store_.getRelationships(query_params);
 
     if (!relationships.empty()) {
-        ResponseFormatter::MakeJSONResponse(res, relationships);
+        ResponseFormatter::makeJSONResponse(res, relationships);
     } else {
-        ResponseFormatter::MakeErrorResponse(res, http::status::not_found, "Не найдено");
+        ResponseFormatter::makeErrorResponse(res, http::status::not_found, "Не найдено");
     }
 }
 
-void RequestHandler::HandleAddLevel(http::request<http::string_body>& req, http::response<http::string_body>& res) {
+void RequestHandler::handleAddLevel(http::request<http::string_body>& req, http::response<http::string_body>& res) {
     try {
         auto json_data = json::parse(req.body()).as_object();
-        auto result = store_.AddLevel(json_data);
+        auto result = store_.addLevel(json_data);
 
         if (isResultSuccess(result)) {
-            ResponseFormatter::MakeJSONResponse(res, result);
+            ResponseFormatter::makeJSONResponse(res, result);
         } else {
-            ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "Уровень не добавлен");
+            ResponseFormatter::makeErrorResponse(res, http::status::bad_request, "Уровень не добавлен");
         }
         
     } catch (...) {
-        ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "Не корректный JSON");
+        ResponseFormatter::makeErrorResponse(res, http::status::bad_request, "Не корректный JSON");
     }
 }
 
-void RequestHandler::HandleAddCi(http::request<http::string_body>& req, http::response<http::string_body>& res) {
+void RequestHandler::handleAddCi(http::request<http::string_body>& req, http::response<http::string_body>& res) {
     try {
         auto json_data = json::parse(req.body());
         boost::json::object result;
 
         if (json_data.is_array()) {
-            result = store_.AddCis(json_data.as_array());
+            result = store_.addCis(json_data.as_array());
         } else if (json_data.is_object()) {
-            auto result = store_.AddCi(json_data.as_object());            
-        } else {
-            throw std::runtime_error("Invalid JSON data");
-        }
-
-        if (isResultSuccess(result)) {
-            ResponseFormatter::MakeJSONResponse(res, result);
-        } else{
-            ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "КЕ не добавлен(ы)");
-        }
-
-    } catch (const std::exception& e) {
-        ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, e.what());
-    } catch (...) {
-        ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "Не корректный JSON");
-    }
-}
-
-void RequestHandler::HandleAddRelationships(http::request<http::string_body>& req, http::response<http::string_body>& res) {
-    try {
-        auto json_data = json::parse(req.body());
-        boost::json::object result;
-
-        if (json_data.is_array()) {
-            result = store_.AddRelationships(json_data.as_array());
-        } else if (json_data.is_object()) {
-            result = store_.AddRelationship(json_data.as_object());            
-        } else {
-            throw std::runtime_error("Не корректный JSON data");
-        }
-
-        if (isResultSuccess(result)) {
-            ResponseFormatter::MakeJSONResponse(res, result);
-        } else{
-            ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "Связи не добавлен(ы)");
-        }
-
-    } catch (const std::exception& e) {
-        ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, e.what());
-    } catch (...) {
-        ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "Не корректный JSON");
-    }    
-}
-
-void RequestHandler::HandleDeleteLevel(http::request<http::string_body>& req, http::response<http::string_body>& res) {
-    std::map<std::string, std::string> query_params = getQueryParams(req);
-
-    if (query_params.count("id")) {
-        try {
-            int id = std::stoi(query_params["id"]);
-            auto result = store_.DeleteLevel(id);
-
-            if (isResultSuccess(result)) {
-                ResponseFormatter::MakeJSONResponse(res, result);
-            } else {
-                ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "Уровень не удален");
-            }
-        } catch (...) {
-            ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "Не корректный id");
-        }
-    } else {
-        ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "Пропущен id");
-    }
-}
-
-void RequestHandler::HandleDeleteCi(http::request<http::string_body>& req, http::response<http::string_body>& res) {
-    std::map<std::string, std::string> query_params =getQueryParams(req);
-
-    if (query_params.count("id")) {
-        try {
-            std::string id = query_params["id"];
-            auto result = store_.DeleteCi(id);
-
-            if (isResultSuccess(result)) {
-                ResponseFormatter::MakeJSONResponse(res, result);
-            } else {
-                ResponseFormatter::MakeErrorResponse(res, http::status::not_found, "CI не удален");
-            }
-        } catch (...) {
-            ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "Не корректный id");
-        }
-    } else {
-        ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "Пропущен id");
-    }
-}
-
-void RequestHandler::HandleDeleteRelationships(http::request<http::string_body>& req, http::response<http::string_body>& res) {
-    std::map<std::string, std::string> query_params = getQueryParams(req);
-
-    boost::json::object result = store_.DeleteRelationships(query_params);
-
-    ResponseFormatter::MakeJSONResponse(res, result);
-}
-
-void RequestHandler::HandleUpdateCi(http::request<http::string_body>& req, http::response<http::string_body>& res) {
-    try {
-        auto json_data = json::parse(req.body());
-        boost::json::object result;
-
-        if (json_data.is_array()) {
-            result = store_.UpdateCis(json_data.as_array());
-        } else if (json_data.is_object()) {
-            result = store_.UpdateCi(json_data.as_object());            
+            auto result = store_.addCi(json_data.as_object());            
         } else {
             throw std::runtime_error("Не корректный JSON");
         }
 
         if (isResultSuccess(result)) {
-            ResponseFormatter::MakeJSONResponse(res, result);
+            ResponseFormatter::makeJSONResponse(res, result);
         } else{
-            ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "КЕ не обновлен(ы)");
+            ResponseFormatter::makeErrorResponse(res, http::status::bad_request, "КЕ не добавлен(ы)");
         }
 
     } catch (const std::exception& e) {
-        ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, e.what());
+        ResponseFormatter::makeErrorResponse(res, http::status::bad_request, e.what());
     } catch (...) {
-        ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "Не корректный JSON");
+        ResponseFormatter::makeErrorResponse(res, http::status::bad_request, "Не корректный JSON");
     }
 }
 
-void RequestHandler::HandleUpdateLevel(http::request<http::string_body>& req, http::response<http::string_body>& res) {
+void RequestHandler::handleAddRelationships(http::request<http::string_body>& req, http::response<http::string_body>& res) {
+    try {
+        auto json_data = json::parse(req.body());
+        boost::json::object result;
+
+        if (json_data.is_array()) {
+            result = store_.addRelationships(json_data.as_array());
+        } else if (json_data.is_object()) {
+            result = store_.addRelationship(json_data.as_object());            
+        } else {
+            throw std::runtime_error("Не корректный JSON data");
+        }
+
+        if (isResultSuccess(result)) {
+            ResponseFormatter::makeJSONResponse(res, result);
+        } else{
+            ResponseFormatter::makeErrorResponse(res, http::status::bad_request, "Связи не добавлен(ы)");
+        }
+
+    } catch (const std::exception& e) {
+        ResponseFormatter::makeErrorResponse(res, http::status::bad_request, e.what());
+    } catch (...) {
+        ResponseFormatter::makeErrorResponse(res, http::status::bad_request, "Не корректный JSON");
+    }    
+}
+
+void RequestHandler::handleDeleteLevel(http::request<http::string_body>& req, http::response<http::string_body>& res) {
+    std::map<std::string, std::string> query_params = getQueryParams(req);
+
+    if (query_params.count("id")) {
+        try {
+            int id = std::stoi(query_params["id"]);
+            auto result = store_.deleteLevel(id);
+
+            if (isResultSuccess(result)) {
+                ResponseFormatter::makeJSONResponse(res, result);
+            } else {
+                ResponseFormatter::makeErrorResponse(res, http::status::bad_request, "Уровень не удален");
+            }
+        } catch (...) {
+            ResponseFormatter::makeErrorResponse(res, http::status::bad_request, "Не корректный id");
+        }
+    } else {
+        ResponseFormatter::makeErrorResponse(res, http::status::bad_request, "Пропущен id");
+    }
+}
+
+void RequestHandler::handleDeleteCi(http::request<http::string_body>& req, http::response<http::string_body>& res) {
+    std::map<std::string, std::string> query_params =getQueryParams(req);
+
+    if (query_params.count("id")) {
+        try {
+            std::string id = query_params["id"];
+            auto result = store_.deleteCi(id);
+
+            if (isResultSuccess(result)) {
+                ResponseFormatter::makeJSONResponse(res, result);
+            } else {
+                ResponseFormatter::makeErrorResponse(res, http::status::not_found, "CI не удален");
+            }
+        } catch (...) {
+            ResponseFormatter::makeErrorResponse(res, http::status::bad_request, "Не корректный id");
+        }
+    } else {
+        ResponseFormatter::makeErrorResponse(res, http::status::bad_request, "Пропущен id");
+    }
+}
+
+void RequestHandler::handleDeleteRelationships(http::request<http::string_body>& req, http::response<http::string_body>& res) {
+    std::map<std::string, std::string> query_params = getQueryParams(req);
+
+    boost::json::object result = store_.deleteRelationships(query_params);
+
+    ResponseFormatter::makeJSONResponse(res, result);
+}
+
+void RequestHandler::handleUpdateCi(http::request<http::string_body>& req, http::response<http::string_body>& res) {
+    try {
+        auto json_data = json::parse(req.body());
+        boost::json::object result;
+
+        if (json_data.is_array()) {
+            result = store_.updateCis(json_data.as_array());
+        } else if (json_data.is_object()) {
+            result = store_.updateCi(json_data.as_object());            
+        } else {
+            throw std::runtime_error("Не корректный JSON");
+        }
+
+        if (isResultSuccess(result)) {
+            ResponseFormatter::makeJSONResponse(res, result);
+        } else{
+            ResponseFormatter::makeErrorResponse(res, http::status::bad_request, "КЕ не обновлен(ы)");
+        }
+
+    } catch (const std::exception& e) {
+        ResponseFormatter::makeErrorResponse(res, http::status::bad_request, e.what());
+    } catch (...) {
+        ResponseFormatter::makeErrorResponse(res, http::status::bad_request, "Не корректный JSON");
+    }
+}
+
+void RequestHandler::handleUpdateLevel(http::request<http::string_body>& req, http::response<http::string_body>& res) {
     auto json_data = json::parse(req.body()).as_object();
-    auto result = store_.UpdateLevel(json_data);
+    auto result = store_.updateLevel(json_data);
 
     if (isResultSuccess(result)) {
-        ResponseFormatter::MakeJSONResponse(res, result);
+        ResponseFormatter::makeJSONResponse(res, result);
     } else {
-        ResponseFormatter::MakeErrorResponse(res, http::status::bad_request, "Уровень не обновлен");
+        ResponseFormatter::makeErrorResponse(res, http::status::bad_request, "Уровень не обновлен");
     }
 
 }
@@ -305,9 +305,9 @@ bool RequestHandler::isResultSuccess(json::object& result) {
     return true;
 }
 
-void RequestHandler::HandleGetProps(http::request<http::string_body>& req, http::response<http::string_body>& res) {
+void RequestHandler::handleGetProps(http::request<http::string_body>& req, http::response<http::string_body>& res) {
     boost::json::object result;
 
-    result = store_.GetPropsList();
-    ResponseFormatter::MakeJSONResponse(res, result);    
+    result = store_.getPropsList();
+    ResponseFormatter::makeJSONResponse(res, result);    
 }
