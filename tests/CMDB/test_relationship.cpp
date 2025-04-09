@@ -6,8 +6,7 @@ using namespace cmdb;
 
 BOOST_AUTO_TEST_SUITE(RelationshipTestSuite)
 
-BOOST_AUTO_TEST_CASE(ConstructorAndGetters)
-{
+BOOST_AUTO_TEST_CASE(ConstructorAndGetters) {
     Relationship rel("CI001", "CI002", "DependsOn", 2.5);
 
     BOOST_CHECK_EQUAL(rel.getSource(), "CI001");
@@ -16,8 +15,7 @@ BOOST_AUTO_TEST_CASE(ConstructorAndGetters)
     BOOST_CHECK_CLOSE(rel.getWeight(), 2.5, 0.001);
 }
 
-BOOST_AUTO_TEST_CASE(JsonSerialization)
-{
+BOOST_AUTO_TEST_CASE(JsonSerialization) {
     Relationship rel("CI001", "CI002", "Hosts", 1.0);
     boost::json::object obj = rel.asJSON();
 
@@ -27,8 +25,7 @@ BOOST_AUTO_TEST_CASE(JsonSerialization)
     BOOST_CHECK_CLOSE(obj["weight"].as_double(), 1.0, 0.001);
 }
 
-BOOST_AUTO_TEST_CASE(JsonStringFormat)
-{
+BOOST_AUTO_TEST_CASE(JsonStringFormat) {
     Relationship rel("CI-A", "CI-B", "ConnectedTo", 3.14);
     std::string jsonStr = rel.getCIasJSONstring();
 
@@ -38,17 +35,17 @@ BOOST_AUTO_TEST_CASE(JsonStringFormat)
     BOOST_CHECK(jsonStr.find("\"weight\":3.14") != std::string::npos);
 }
 
-BOOST_AUTO_TEST_CASE(SaveAndLoad)
-{
+BOOST_AUTO_TEST_CASE(SaveAndLoad) {
+    std::string file_name = "relationship_test.bin";
     Relationship relOut("CI123", "CI456", "LinkedTo", 0.75);
 
-    std::ofstream ofs("relationship_test.json");
+    std::ofstream ofs(file_name);
     BOOST_REQUIRE(ofs.is_open());
     BOOST_CHECK(relOut.save(ofs));
     ofs.close();
 
     Relationship relIn;
-    std::ifstream ifs("relationship_test.json");
+    std::ifstream ifs(file_name);
     BOOST_REQUIRE(ifs.is_open());
     BOOST_CHECK(relIn.load(ifs));
     ifs.close();
