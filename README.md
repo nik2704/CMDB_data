@@ -1,6 +1,6 @@
 # Централизованное хранилище Configuration Management Database (CMDB) с многопоточным HTTP API для управления данными в микросервисной архитектуре
 
-[![C++](https://img.shields.io/badge/C%2B%2B-20-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B20)
+[![C++](https://img.shields.io/badge/C%2B%2B-17-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B20)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 ## Описание
