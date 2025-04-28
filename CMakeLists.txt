@@ -160,11 +160,14 @@ endif()
 message(STATUS "Boost include dirs: ${Boost_INCLUDE_DIRS}")
 message(STATUS "Boost libraries: ${Boost_LIBRARIES}")
 
+# Установка бинарника
+install(TARGETS cmdb_service RUNTIME DESTINATION bin)
+
+set(CPACK_GENERATOR DEB)
+set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
+set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
+set(CPACK_PACKAGE_CONTACT nik2704@yandex.ru)
+
 include(CPack)
-set(CPACK_PACKAGE_NAME "cmdb_service")
-set(CPACK_PACKAGE_VERSION "0.0.${PATCH_VERSION}")
-set(CPACK_GENERATOR "DEB")
-set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Nikolay")
-set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "CMDB Service — пример проекта с Boost")
-set(CPACK_DEBIAN_PACKAGE_DEPENDS "libboost-system1.67-dev, libboost-thread1.67-dev, libboost-program-options1.67-dev, libssl-dev")
 
