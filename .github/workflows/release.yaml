@@ -11,16 +11,18 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: true
-      
       # Install dependencies
       - run: sudo apt-get update && sudo apt-get install libboost-program-options-dev libboost-system-dev libboost-filesystem-dev -y
       - run: sudo apt-get update
-      - run: sudo apt-get install -y libboost-all-dev nlohmann-json3-dev libssl-dev
+      - run: sudo apt-get install -y libboost-all-dev
 
-      # Configure build
+      # Ensure static versions of libraries are used
+      - run: sudo apt-get install libboost-all-dev -y # Ensures Boost libraries are available
+      - run: sudo apt-get install libssl-dev -y  # Ensure OpenSSL is statically linked
+
+      # Build Setup
       - run: mkdir -p build
-      # - run: cmake -B build -S . -DPATCH_VERSION=${{ github.run_number }} -DWITH_BOOST_TEST=ON -DBOOST_USE_STATIC_LIBS=ON -DOPENSSL_USE_STATIC_LIBS=TRUE
-      - run: cmake -B build -S . -DPATCH_VERSION=${{ github.run_number }} -DWITH_BOOST_TEST=ON -DBOOST_USE_STATIC_LIBS=ON -DOPENSSL_USE_STATIC_LIBS=TRUE -DPROJECT_VERSION_MAJOR=0 -DPROJECT_VERSION_MINOR=0 -DPROJECT_VERSION_PATCH=${{ github.run_number }}
+      - run: cmake -B build -S . -DPATCH_VERSION=${{ github.run_number }} -DWITH_BOOST_TEST=ON -DBOOST_USE_STATIC_LIBS=ON -DOPENSSL_USE_STATIC_LIBS=TRUE
 
       # Build project
       - run: cmake --build build
@@ -29,9 +31,7 @@ jobs:
       - run: ctest --test-dir build --output-on-failure
 
       # Build package (only if tests pass)
-      # - run: cmake --build build --target package
-      - run: cpack --config build/CPackConfig.cmake
-
+      - run: cmake --build build --target package
 
       # Create GitHub Release
       - name: Create Release

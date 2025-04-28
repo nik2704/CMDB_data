@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.12)
-project(cmdb_service)
+
+# Устанавливаем версию проекта
+set(PATCH_VERSION "1" CACHE INTERNAL "Patch version")
+set(PROJECT_VERSION 0.0.${PATCH_VERSION})
+project(cmdb_service VERSION ${PROJECT_VERSION})
 
 option(WITH_BOOST_TEST "Whether to build Boost test" ON)
 
@@ -159,6 +163,18 @@ endif()
 
 message(STATUS "Boost include dirs: ${Boost_INCLUDE_DIRS}")
 message(STATUS "Boost libraries: ${Boost_LIBRARIES}")
+
+# Включаем директории заголовков
+target_include_directories(cmdb_service
+    PRIVATE ${Boost_INCLUDE_DIRS}
+)
+
+# Настройки компиляции
+if (MSVC)
+    target_compile_options(cmdb_service PRIVATE /W4)
+else()
+    target_compile_options(cmdb_service PRIVATE -Wall -Wextra -pedantic -Werror)
+endif()
 
 # Установка бинарника
 install(TARGETS cmdb_service RUNTIME DESTINATION bin)
