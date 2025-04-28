@@ -18,7 +18,6 @@ set(Boost_USE_STATIC_RUNTIME OFF)
 
 # Поиск Boost
 find_package(Boost 1.67 REQUIRED COMPONENTS system thread json program_options unit_test_framework)
-UIRED COMPONENTS system thread json program_options)
 
 # Добавляем исполняемый файл
 add_executable(cmdb_service 

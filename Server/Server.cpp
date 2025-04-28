@@ -37,10 +37,31 @@ void Server::session(std::shared_ptr<tcp::socket> socket) {
         beast::flat_buffer buffer;
         http::request<http::string_body> req;
         http::read(*socket, buffer, req);
+
         http::response<http::string_body> res;
         handler_.handleRequest(req, res);
+
+        res.keep_alive(req.keep_alive());
         http::write(*socket, res);
+
+        if (!req.keep_alive()) {
+            socket->shutdown(tcp::socket::shutdown_send);
+        }
     } catch (const std::exception& e) {
         std::cerr << "Ошибка: " << e.what() << "\n";
     }
 }
+
+// void Server::session(std::shared_ptr<tcp::socket> socket) {
+//     try {
+//         std::cout << "Запрос обработан в потоке: " << std::this_thread::get_id() << std::endl;
+//         beast::flat_buffer buffer;
+//         http::request<http::string_body> req;
+//         http::read(*socket, buffer, req);
+//         http::response<http::string_body> res;
+//         handler_.handleRequest(req, res);
+//         http::write(*socket, res);
+//     } catch (const std::exception& e) {
+//         std::cerr << "Ошибка: " << e.what() << "\n";
+//     }
+// }
