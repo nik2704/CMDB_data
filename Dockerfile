@@ -3,38 +3,30 @@ FROM ubuntu:latest
 # Обновление пакетов
 RUN apt-get update && apt-get upgrade -y
 
-# Установка необходимых зависимостей
+# Установка зависимостей, которые нужны для работы приложения (но не для сборки!)
 RUN apt-get install -y \
-    build-essential \
-    cmake \
-    libboost-dev \
     libboost-system-dev \
     libboost-thread-dev \
     libboost-json-dev \
     libboost-program-options-dev \
+    wget \
+    dpkg \
     --no-install-recommends
 
 # Создание рабочей директории
 WORKDIR /app
 
-# Копирование исходного кода
-COPY . /app
+# Скачать готовый релиз
+RUN wget -O cmdb_service.deb https://github.com/nik2704/CMDB_data/releases/download/v6/cmdb_service-0.0.1-Linux.deb
 
-# Создание директории сборки
-RUN mkdir build && cd build
+# Установить DEB-пакет
+RUN dpkg -i cmdb_service.deb || apt-get install -fy
 
-# Сборка проекта с CMake
-RUN cmake ..
-RUN make -j $(nproc)
-
-# Создание директории для артефактов (опционально)
-RUN mkdir -p /app/output
-
-# Копирование собранного исполняемого файла в директорию артефактов
-COPY build/cmdb_service /app/output/
+# (если нужно, создать директорию для запуска)
+WORKDIR /app/output
 
 # Определение команды для запуска приложения
-CMD ["/app/output/cmdb_service"]
+CMD ["/usr/bin/cmdb_service"]
 
-# Определение порта, который слушает приложение (для документации)
+# Определение порта
 EXPOSE 8080
