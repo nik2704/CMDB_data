@@ -305,7 +305,7 @@ bool RequestHandler::isResultSuccess(json::object& result) {
     return true;
 }
 
-void RequestHandler::handleGetProps(http::request<http::string_body>& req, http::response<http::string_body>& res) {
+void RequestHandler::handleGetProps(http::request<http::string_body>& /*req*/, http::response<http::string_body>& res) {
     boost::json::object result;
 
     result = store_.getPropsList();

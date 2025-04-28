@@ -63,7 +63,7 @@ bool CMDB::addCI(
     const std::unordered_map<std::string, std::string>& properties
     )
 {
-    if (level >= levels_.size()) {
+    if (level >= static_cast<int>(levels_.size())) {
         return false;
     }
     std::lock_guard<std::mutex> lock(cis_mutex_);
@@ -448,7 +448,7 @@ void CMDB::deletePropertiesMap(CIPtr ci, const std::unordered_map<std::string, s
     }
 }
     
-void CMDB::addPropertyToMap(CIPtr ci, const std::string& property_name, const std::string& property_value) {
+void CMDB::addPropertyToMap(CIPtr ci, const std::string& property_name, const std::string& /*property_value*/) {
     CIList& ci_list = property_to_cis_[property_name];
 
     if (std::find(ci_list.begin(), ci_list.end(), ci) == ci_list.end()) {
@@ -577,7 +577,7 @@ std::shared_ptr<std::vector<CMDB::RelationshipPtr>> CMDB::getRelationshipsImpl(P
 }
 
 std::shared_ptr<std::vector<CMDB::RelationshipPtr>> CMDB::getRelationships() const {
-    return getRelationshipsImpl([](const RelationshipPtr& relationship) { return true; });
+    return getRelationshipsImpl([](const RelationshipPtr& /*relationship*/) { return true; });
 }
 
 std::shared_ptr<std::vector<CMDB::RelationshipPtr>> CMDB::getRelationships(const std::string& from_id) const {
