@@ -31,31 +31,8 @@ void Server::acceptConnections() {
     });
 }
 
-// void Server::session(std::shared_ptr<tcp::socket> socket) {
-//     try {
-//         std::cout << "Запрос обработан в потоке: " << std::this_thread::get_id() << std::endl;
-//         beast::flat_buffer buffer;
-//         http::request<http::string_body> req;
-//         http::read(*socket, buffer, req);
-
-//         http::response<http::string_body> res;
-//         handler_.handleRequest(req, res);
-
-//         res.keep_alive(req.keep_alive());
-//         http::write(*socket, res);
-
-//         if (!req.keep_alive()) {
-//             socket->shutdown(tcp::socket::shutdown_send);
-//         }
-//     } catch (const std::exception& e) {
-//         std::cerr << "Ошибка: " << e.what() << "\n";
-//     }
-// }
-
 void Server::session(std::shared_ptr<tcp::socket> socket) {
     try {
-        std::cout << "Запрос обработан в потоке: " << std::this_thread::get_id() << std::endl;
-        
         beast::flat_buffer buffer;
         http::request<http::string_body> req;
         http::read(*socket, buffer, req);
@@ -65,17 +42,15 @@ void Server::session(std::shared_ptr<tcp::socket> socket) {
 
         http::write(*socket, res);
 
-        // Правильное завершение соединения
         beast::error_code ec;
         socket->shutdown(tcp::socket::shutdown_send, ec);
-        // shutdown может вернуть ошибку, например если клиент сам уже закрыл соединение
+
         if (ec && ec != beast::errc::not_connected) {
             throw beast::system_error(ec);
         }
 
     } catch (const beast::system_error& e) {
         if (e.code() == http::error::end_of_stream) {
-            // Это нормальная ситуация, просто игнорируем
             return;
         }
         std::cerr << "Beast ошибка: " << e.what() << "\n";
@@ -83,18 +58,3 @@ void Server::session(std::shared_ptr<tcp::socket> socket) {
         std::cerr << "Ошибка: " << e.what() << "\n";
     }
 }
-
-
-// void Server::session(std::shared_ptr<tcp::socket> socket) {
-//     try {
-//         std::cout << "Запрос обработан в потоке: " << std::this_thread::get_id() << std::endl;
-//         beast::flat_buffer buffer;
-//         http::request<http::string_body> req;
-//         http::read(*socket, buffer, req);
-//         http::response<http::string_body> res;
-//         handler_.handleRequest(req, res);
-//         http::write(*socket, res);
-//     } catch (const std::exception& e) {
-//         std::cerr << "Ошибка: " << e.what() << "\n";
-//     }
-// }

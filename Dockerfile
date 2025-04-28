@@ -17,7 +17,7 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
 WORKDIR /app
 
 # Скачать готовый релиз
-RUN wget -O cmdb_service.deb https://github.com/nik2704/CMDB_data/releases/download/v7/cmdb_service-0.0.7-Linux.deb
+RUN wget -O cmdb_service.deb https://github.com/nik2704/CMDB_data/releases/download/v10/cmdb_service-0.0.10-Linux.deb
 
 # Установить DEB-пакет
 RUN apt-get install -y ./cmdb_service.deb
