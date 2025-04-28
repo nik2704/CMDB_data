@@ -15,6 +15,7 @@ set(Boost_USE_STATIC_RUNTIME OFF)
 
 # Поиск Boost
 find_package(Boost 1.67 REQUIRED COMPONENTS system thread json program_options unit_test_framework)
+
 #find_package(Boost 1.67 REQUIRED COMPONENTS system thread json program_options)
 
 # Добавляем исполняемый файл
@@ -158,3 +159,12 @@ endif()
 
 message(STATUS "Boost include dirs: ${Boost_INCLUDE_DIRS}")
 message(STATUS "Boost libraries: ${Boost_LIBRARIES}")
+
+include(CPack)
+set(CPACK_PACKAGE_NAME "cmdb_service")
+set(CPACK_PACKAGE_VERSION "0.0.${PATCH_VERSION}")
+set(CPACK_GENERATOR "DEB")
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Nikolay")
+set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "CMDB Service — пример проекта с Boost")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "libboost-system1.67-dev, libboost-thread1.67-dev, libboost-program-options1.67-dev, libssl-dev")
+
