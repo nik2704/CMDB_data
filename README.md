@@ -101,4 +101,16 @@ cmdb_service/
 ./cmdb_server -p 9000 -t 4 -d my_cmdb.dat
 ```
 
+Проверка в Docker:
+```bash
+docker build -t cmdb_service_image .
+docker run --rm -it -p 8080:8080 cmdb_service_image
+```
+
+Пояснения:
+
+`--rm` — удалить контейнер после остановки.
+`-it` — интерактивный режим (чтобы видеть логи).
+`-p 8080:8080` — пробросить порт (если твой сервис слушает 8080).
+cmdb_service_image — имя образа.
 

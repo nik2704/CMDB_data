@@ -1,32 +1,32 @@
 FROM ubuntu:latest
 
-# Обновление пакетов
-RUN apt-get update && apt-get upgrade -y
-
-# Установка зависимостей, которые нужны для работы приложения (но не для сборки!)
-RUN apt-get install -y \
+# Обновление пакетов и установка необходимых утилит
+RUN apt-get update && apt-get upgrade -y && apt-get install -y \
+    build-essential \
+    cmake \
+    libboost-dev \
     libboost-system-dev \
     libboost-thread-dev \
     libboost-json-dev \
     libboost-program-options-dev \
     wget \
-    dpkg \
+    ca-certificates \
     --no-install-recommends
 
 # Создание рабочей директории
 WORKDIR /app
 
 # Скачать готовый релиз
-RUN wget -O cmdb_service.deb https://github.com/nik2704/CMDB_data/releases/download/v6/cmdb_service-0.0.1-Linux.deb
+RUN wget -O cmdb_service.deb https://github.com/nik2704/CMDB_data/releases/download/v7/cmdb_service-0.0.7-Linux.deb
 
 # Установить DEB-пакет
-RUN dpkg -i cmdb_service.deb || apt-get install -fy
+RUN apt-get install -y ./cmdb_service.deb
 
-# (если нужно, создать директорию для запуска)
-WORKDIR /app/output
+# Очистить ненужное
+RUN rm cmdb_service.deb
 
 # Определение команды для запуска приложения
 CMD ["/usr/bin/cmdb_service"]
 
-# Определение порта
+# Проброс порта
 EXPOSE 8080

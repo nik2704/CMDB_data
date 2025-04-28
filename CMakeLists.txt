@@ -15,12 +15,10 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # Опции для статической линковки (если нужно)
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
-# set(Boost_USE_STATIC_RUNTIME ON)  # Используйте только если хотите статический рантайм
 
 # Поиск Boost
 find_package(Boost 1.67 REQUIRED COMPONENTS system thread json program_options unit_test_framework)
-
-#find_package(Boost 1.67 REQUIRED COMPONENTS system thread json program_options)
+UIRED COMPONENTS system thread json program_options)
 
 # Добавляем исполняемый файл
 add_executable(cmdb_service 
@@ -45,8 +43,6 @@ endif()
 target_compile_definitions(cmdb_service PRIVATE -DBOOST_ALL_NO_LIB)
 
 # Включение всех необходимых заголовочных директорий
-# Это уже обрабатывается через target_include_directories для конкретных целей
-
 set_target_properties(cmdb_service PROPERTIES
     CXX_STANDARD 17
     CXX_STANDARD_REQUIRED ON
