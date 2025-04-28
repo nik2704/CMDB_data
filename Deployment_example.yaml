@@ -35,7 +35,7 @@ spec:
     - protocol: TCP
       port: 80 # Порт, на котором будет доступен сервис внутри кластера
       targetPort: 8080 # Порт контейнера
-  type: LoadBalancer # Или ClusterIP, NodePort в зависимости от ваших потребностей
+  type: ClusterIP # Или LoadBalancer, NodePort в зависимости от ваших потребностей
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

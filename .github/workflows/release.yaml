@@ -1,0 +1,55 @@
+name: 'C++ CI'
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      
+      # Install dependencies
+      - run: sudo apt-get update && sudo apt-get install libboost-program-options-dev libboost-system-dev libboost-filesystem-dev -y
+      - run: sudo apt-get update
+      - run: sudo apt-get install -y libboost-all-dev nlohmann-json3-dev libssl-dev
+
+      # Configure build
+      - run: mkdir -p build
+      - run: cmake -B build -S . -DPATCH_VERSION=${{ github.run_number }} -DWITH_BOOST_TEST=ON -DBOOST_USE_STATIC_LIBS=ON -DOPENSSL_USE_STATIC_LIBS=TRUE
+
+      # Build project
+      - run: cmake --build build
+
+      # Run tests
+      - run: ctest --test-dir build --output-on-failure
+
+      # Build package (only if tests pass)
+      - run: cmake --build build --target package
+
+      # Create GitHub Release
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        with:
+          tag_name: v${{ github.run_number }}
+          release_name: Release ${{ github.run_number }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_ACCESS_TOKEN }}
+
+      # Upload built package to the Release
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_ACCESS_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./build/cmdb_service-0.0.${{ github.run_number }}-Linux.deb
+          asset_name: cmdb_service-0.0.${{ github.run_number }}-Linux.deb
+          asset_content_type: application/vnd.debian.binary-package
